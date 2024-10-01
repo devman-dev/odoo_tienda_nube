@@ -199,11 +199,11 @@ class TiendaNubeWebHook(http.Controller):
                     )
         except Exception as e:
             _logger.info('*********** Error: %s' % e)
+            request.env['ir.config_parameter'].sudo().set_param(lock_name, 'Disponible')
             return request.make_response(
                 json.dumps({"mensaje": "Error al procesar la solicitud"}),
                 headers={'Content-Type': 'application/json'},
                 status=500
             )
-            request.env['ir.config_parameter'].sudo().set_param(lock_name, 'Disponible')
         finally:
             request.env['ir.config_parameter'].sudo().set_param(lock_name, 'Disponible')
