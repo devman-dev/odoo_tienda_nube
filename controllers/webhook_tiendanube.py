@@ -197,5 +197,13 @@ class TiendaNubeWebHook(http.Controller):
                         headers={'Content-Type': 'application/json'},
                         status=404
                     )
+        except Exception as e:
+            _logger.info('*********** Error: %s' % e)
+            return request.make_response(
+                json.dumps({"mensaje": "Error al procesar la solicitud"}),
+                headers={'Content-Type': 'application/json'},
+                status=500
+            )
+            request.env['ir.config_parameter'].sudo().set_param(lock_name, 'Disponible')
         finally:
             request.env['ir.config_parameter'].sudo().set_param(lock_name, 'Disponible')
