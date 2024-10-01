@@ -1,0 +1,42 @@
+<odoo>
+    <data>
+        <!-- Tree View -->
+        <record id="view_category_tn_tree" model="ir.ui.view">
+            <field name="name">category.tn.tree</field>
+            <field name="model">category.tn</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                    <field name="tn_id" readonly="1"/>
+                    <field name="parent_id"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Form View -->
+        <record id="view_category_tn_form" model="ir.ui.view">
+            <field name="name">category.tn.form</field>
+            <field name="model">category.tn</field>
+            <field name="arch" type="xml">
+                <header>
+                    <button name="create_or_update_tn" string="Crear/Actualizar en Tienda Nube" type="object" class="oe_highlight"/>
+                    <button name="update_category_tn_odoo" string="Editar desde Tienda Nube" type="object" class="oe_highlight"/>
+                </header>
+                <form>
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="name"/>
+                                <field name="parent_id"/>
+                            </group>
+                            <group>
+                                <field name="tn_id" readonly="1"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+    </data>
+</odoo>

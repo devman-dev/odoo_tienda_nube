@@ -1,0 +1,19 @@
+<odoo>
+    <data>
+    
+        <record id="view_create_all_orders_wizard_form" model="ir.ui.view">
+            <field name="name">create.all.orders.wizard.form</field>
+            <field name="model">create.all.orders.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Create All Orders Wizard">
+                        <h3>Creará todos las ordenes de Tienda Nube que no estén en Odoo, la forma de comparar si existen o no es por medio del ID de Tienda Nube</h3>
+                    <footer>
+                        <button name="create_all_orders" confirm="¿Seguro que quiere traer las ordenes a Odoo?" string="Crear ordenes en Odoo" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+    </data>
+</odoo>

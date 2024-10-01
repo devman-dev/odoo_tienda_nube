@@ -1,0 +1,7 @@
+<odoo>
+    <data>
+        <record id="product_discount_tn" model="product.product">
+            <field name="name">Descuento Tienda Nube</field>
+        </record>
+    </data>
+</odoo>

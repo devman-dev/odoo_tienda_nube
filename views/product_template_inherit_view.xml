@@ -1,0 +1,25 @@
+<odoo>
+    <data>
+        <record model="ir.ui.view" id="view_tn_product_template_inherit">
+            <field name="name">tn.product.template.inherit.form</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_only_form_view"/>
+            <field name="arch" type="xml">
+
+                <header position="inside">
+                    <button name="update_tn" string="Actualizar en Tienda Nube" type="object" class="oe_highlight" attrs="{'invisible': [('id_tn', '=', False)]}"/>
+                    <button name="update_stock_tn" string="Actualizar Stock en Tienda Nube" type="object" class="oe_highlight" attrs="{'invisible': [('id_tn', '=', False)]}"/>
+                    <button name="create_tn" string="Crear en Tienda Nube" type="object" class="oe_highlight" attrs="{'invisible': [('id_tn', '!=', False)]}"/>
+                </header>
+
+                <field name="categ_id" position="after">
+                    <field name="categoria_tn_ids" domain="[('tn_id', '!=', False)]" options="{'no_create': True, 'no_create_edit':True}" widget="many2many_tags"/>
+                    <field name="id_tn" readonly="1"/>
+                    <field name="envio_gratis_tn"/>
+                    <field name="mostrar_en_tienda_tn"/>
+                </field>
+                
+            </field>
+        </record>
+    </data>
+</odoo>

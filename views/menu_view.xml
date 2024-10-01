@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<odoo>
+
+     <!-- Configuración --> 
+     <!-- Cupones -->
+    <record id="action_open_coupon_tn" model="ir.actions.act_window">
+        <field name="name">Cupones de Tienda Nube</field>
+        <field name="res_model">coupon.tn</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+     <!-- Logs -->
+    <record id="action_open_logs_tn" model="ir.actions.act_window">
+        <field name="name">Logs de Tienda Nube</field>
+        <field name="res_model">tn.log</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+     <!-- Webhooks -->
+    <record id="action_open_webhooks_tn" model="ir.actions.act_window">
+        <field name="name">Webhooks</field>
+        <field name="res_model">webhook.tn</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+    <!-- Webhooks Recibidos -->
+    <record id="action_open_webhooks_received_tn" model="ir.actions.act_window">
+        <field name="name">Webhooks Recibidos</field>
+        <field name="res_model">webhook.tn.received</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{'create': False}</field>
+    </record>
+
+     <!-- Productos --> 
+    <record id="action_open_products_tn" model="ir.actions.act_window">
+        <field name="name">Productos de TN</field>
+        <field name="res_model">product.template</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('id_tn', '!=', False)]</field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_open_category_tn" model="ir.actions.act_window">
+        <field name="name">Categories</field>
+        <field name="res_model">category.tn</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+
+    <!-- Wizards -->
+    <record id="action_create_all_products_wizard" model="ir.actions.act_window">
+        	<field name="name">Crear productos de TN en Odoo</field>
+        	<field name="type">ir.actions.act_window</field>
+        	<field name="res_model">create.all.products.wizard</field>
+        	<field name="view_mode">form</field>
+        	<field name="view_id" ref="view_create_all_products_wizard_form"/>
+        	<field name="target">new</field>
+    </record>
+    <record id="action_create_all_category_wizard" model="ir.actions.act_window">
+        	<field name="name">Crear categorias de TN en Odoo</field>
+        	<field name="type">ir.actions.act_window</field>
+        	<field name="res_model">create.all.category.wizard</field>
+        	<field name="view_mode">form</field>
+        	<field name="view_id" ref="view_create_all_category_wizard_form"/>
+        	<field name="target">new</field>
+    </record>
+    <record id="action_create_all_webhook_wizard" model="ir.actions.act_window">
+        	<field name="name">Crear webhooks de TN en Odoo</field>
+        	<field name="type">ir.actions.act_window</field>
+        	<field name="res_model">create.all.webhook.wizard</field>
+        	<field name="view_mode">form</field>
+        	<field name="view_id" ref="view_create_all_webhook_wizard_form"/>
+        	<field name="target">new</field>
+    </record>
+    <record id="action_create_all_coupon_wizard" model="ir.actions.act_window">
+        	<field name="name">Crear cupones de TN en Odoo</field>
+        	<field name="type">ir.actions.act_window</field>
+        	<field name="res_model">create.all.coupon.wizard</field>
+        	<field name="view_mode">form</field>
+        	<field name="view_id" ref="view_create_all_coupon_wizard_form"/>
+        	<field name="target">new</field>
+    </record>
+    <record id="action_create_all_orders_wizard" model="ir.actions.act_window">
+        	<field name="name">Crear ordenes de TN en Odoo</field>
+        	<field name="type">ir.actions.act_window</field>
+        	<field name="res_model">create.all.orders.wizard</field>
+        	<field name="view_mode">form</field>
+        	<field name="view_id" ref="view_create_all_orders_wizard_form"/>
+        	<field name="target">new</field>
+    </record>
+    
+    <!-- Menu y Menus principales -->
+    <menuitem id="menu_tn" name="Tienda Nube" web_icon="tiendanube_odoo,static/description/icon.png"/>
+    <menuitem id="menu_products_tn" name="Productos" parent="menu_tn" sequence="1" action="action_open_products_tn"/>
+    <menuitem id="menu_category_tn" name="Categorias" parent="menu_tn" sequence="2" action="action_open_category_tn"/>
+    <!-- Configuraciones -->
+    <menuitem id="menu_settings_tn" name="Configuracion" parent="menu_tn" sequence="3"/>
+
+        <menuitem id="menu_coupon_tn" name="Cupones" parent="menu_settings_tn" action="action_open_coupon_tn" sequence="1"/>
+        <menuitem id="menu_logs_tn" name="Logs" parent="menu_settings_tn" action="action_open_logs_tn" sequence="2"/>
+        <menuitem id="menu_settings_webhooks_tn" name="Webhooks" parent="menu_settings_tn" sequence="3"/>
+            <!-- WebHooks-->
+            <menuitem id="menu_webhooks_tn" name="Webhooks" parent="menu_settings_webhooks_tn" action="action_open_webhooks_tn" sequence="1"/>
+            <menuitem id="menu_webhooks_received_tn" name="Webhooks Recibidos" parent="menu_settings_webhooks_tn" action="action_open_webhooks_received_tn" sequence="1"/>
+        <menuitem id="menu_create_all_products_wizard_action" name="Crear productos de TN en Odoo" parent="menu_settings_tn" action="action_create_all_products_wizard"/>
+        <menuitem id="menu_create_all_category_wizard_action" name="Crear categorias de TN en Odoo" parent="menu_settings_tn" action="action_create_all_category_wizard"/>
+        <menuitem id="menu_create_all_orders_wizard_action" name="Crear Ordenes de TN en Odoo" parent="menu_settings_tn" action="action_create_all_orders_wizard"/>
+        <menuitem id="menu_create_all_webhook_wizard_action" name="Crear/Actualizar Webhooks de TN en Odoo" parent="menu_settings_tn" action="action_create_all_webhook_wizard"/>
+        <menuitem id="menu_create_all_coupon_wizard_action" name="Crear/Actualizar Cupones de TN en Odoo" parent="menu_settings_tn" action="action_create_all_coupon_wizard"/>
+
+</odoo>

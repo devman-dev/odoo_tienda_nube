@@ -1,0 +1,26 @@
+<odoo>
+    <data>
+        <record model="ir.ui.view" id="view_tn_product_product_inherit">
+            <field name="name">tn.product.product.inherit.form</field>
+            <field name="model">product.product</field>
+            <field name="inherit_id" ref="product.product_variant_easy_edit_view"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//field[@name='barcode']" position="after">
+                    <field name="product_id_tn" readonly="1"/>
+                    <field name="precio_promocional_tn" />
+                    <field name="alto_tn" />
+                    <field name="ancho_tn" />
+                    <field name="profundidad_tn" />
+                    <field name="peso_tn" />
+                    <field name="mpn_tn" />
+                    <field name="rango_edad_tn" />
+                    <field name="sexo_tn" />
+                    <field name="inventory_level_id_tn" readonly="1"/>
+                    <field name="location_id_tn" readonly="1"/>
+                </xpath>
+                
+            </field>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="ir_cron_update_stock_tn" model="ir.cron">
+            <field name="name">Actualizar Stock Tienda Nube</field>
+            <field name="model_id" ref="base.model_res_company"/>
+            <field name="interval_number">5</field>
+            <field name="interval_type">minutes</field>
+            <field name="numbercall">-1</field>
+            <field name="state">code</field>
+            <field name="active" eval="True"/>
+            <field name="user_id" ref="base.user_root"/>
+            <field name="code">
+companies = model.search([('tiendanube_code','!=',False)])
+for company in companies:
+  if not company.tn_config_stock_realtime:
+      products = env['product.product'].search([('product_id_tn', '!=', False)])
+      company.update_product_stock_tn(products)</field>
+        </record>
+    </data>
+</odoo>

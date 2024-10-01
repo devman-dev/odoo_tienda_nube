@@ -1,0 +1,59 @@
+<odoo>
+    <data>
+        <!-- Form View -->
+        <record id="view_webhook_tn_form" model="ir.ui.view">
+            <field name="name">webhook.tn.form</field>
+            <field name="model">webhook.tn</field>
+            <field name="arch" type="xml">
+                <header>
+                    <button name="create_or_update_webhook_tn" string="Crear/Actualizar en Tienda Nube" type="object" class="oe_highlight"/>
+                    <button name="delete_webhook_tn" string="Eliminar de Tienda Nube" type="object" class="oe_highlight" confirm="¿Realmente desea eliminar este Webhook de tienda nube?"/>
+                </header>
+                <form>
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="name"/>
+                                <field name="id_webhook_tn" readonly="1"/>
+                                <field name="url"/>
+                                <field name="event"/>
+                                <field name="created_at_tn" readonly="1"/>
+                                <field name="updated_at_tn" readonly="1"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Tree View -->
+        <record id="view_webhook_tn_tree" model="ir.ui.view">
+            <field name="name">webhook.tn.tree</field>
+            <field name="model">webhook.tn</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name" readonly="1"/>
+                    <field name="id_webhook_tn" readonly="1"/>
+                    <field name="url" readonly="1"/>
+                    <field name="event" readonly="1"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Webhook Received-->
+        <!-- Tree View -->
+        <record id="view_webhook_tn_received_tree" model="ir.ui.view">
+            <field name="name">webhook.tn.received.tree</field>
+            <field name="model">webhook.tn.received</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name" readonly="1"/>
+                    <field name="id_event_tn" readonly="1"/>
+                    <field name="event" readonly="1"/>
+                    <field name="store_id" readonly="1"/>
+                    <field name="create_date" readonly="1"/>
+                </tree>
+            </field>
+        </record>
+    </data>
+</odoo>

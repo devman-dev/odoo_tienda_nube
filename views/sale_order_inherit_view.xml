@@ -1,0 +1,84 @@
+<odoo>
+    <data>
+        <!-- Heredar la vista de formulario sale.order -->
+        <record id="view_sale_order_tienda_nube_inherit" model="ir.ui.view">
+            <field name="name">sale.order.inherit.view</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="arch" type="xml">
+                <header position="inside">
+                    <button name="create_order_from_tn" string="Crear orden desde Tienda Nube" type="object" class="oe_highlight"/>
+                </header>
+                <notebook position="inside">
+                    <page string="Tienda Nube">
+                        <group>
+                            <group string="Datos Principales">
+                                <field name="id_tn"/>
+                                <field name="number_tn"/>
+                                <field name="token_tn"/>
+                                <field name="store_id_tn"/>
+                            </group>
+                            <group string="Contacto cliente en Tienda Nube">
+                                <field name="contact_email_tn"/>
+                                <field name="contact_name_tn"/>
+                                <field name="contact_phone_tn"/>
+                                <field name="contact_identification_tn"/>
+                            </group>
+                        </group>
+                        <group>
+                            <group string="Envio">
+                                <field name="shipping_tn"/>
+                                <field name="shipping_cost_owner_tn"/>
+                                <field name="shipping_cost_customer_tn"/>
+                                <field name="shipping_min_days_tn"/>
+                                <field name="shipping_max_days_tn"/>
+                                <field name="shipping_option_tn"/>
+                                <field name="shipping_option_code_tn"/>
+                                <field name="shipping_option_reference_tn"/>
+                                <field name="shipping_pickup_details_tn"/>
+                                <field name="shipping_tracking_number_tn"/>
+                                <field name="shipping_tracking_url_tn"/>
+                                <field name="shipping_store_branch_name_tn"/>
+                                <field name="shipping_store_branch_extra_tn"/>
+                                <field name="shipping_pickup_type_tn"/>
+                            </group>
+                            <group string="Facturacion de cliente en Tienda Nube">
+                                <field name="billing_name_tn"/>
+                                <field name="billing_phone_tn"/>
+                                <field name="billing_address_tn"/>
+                                <field name="billing_number_tn"/>
+                                <field name="billing_floor_tn"/>
+                                <field name="billing_floor_tn"/>
+                                <field name="billing_locality_tn"/>
+                                <field name="billing_zipcode_tn"/>
+                                <field name="billing_city_tn"/>
+                                <field name="billing_province_tn"/>
+                                <field name="billing_country_tn"/>
+                                <field name="billing_customer_type_tn"/>
+                                <field name="billing_business_name_tn"/>
+                                <field name="billing_trade_name_tn"/>
+                                <field name="billing_state_registration_tn"/>
+                                <field name="billing_document_type_tn"/>
+                            </group>
+                        </group>
+
+                        <!-- Notebook -->
+                        <notebook>
+                            <page string="Descuentos">
+                                <group>
+                                    <field name="coupon_tn_ids" widget="many2many_tags"/>
+                                </group>
+                                <group>
+                                    <field name="promotions_applied_tn" readonly="1"/>
+                                </group>
+                            </page>
+                            <page string="Log Json">
+                                <field name="json_tn" readonly="1"/>
+                            </page>
+                        </notebook>
+                    </page>
+                </notebook>
+            </field>
+        </record>
+    </data>
+</odoo>
