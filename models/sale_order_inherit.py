@@ -72,11 +72,9 @@ class SaleOrderTiendaNubeInherit(models.Model):
                 _logger.info("Data: %s", order)
 
                 # Datos de la orden
-                _logger.info("********** Intento 1")
                 created_at = datetime.strptime(order['created_at'], '%Y-%m-%dT%H:%M:%S%z')
-                _logger.info("********** Intento 2")
                 self.date_order = created_at.strftime('%Y-%m-%d %H:%M:%S')
-                _logger.info("********** Intento 3")
+                self.name = 'Tienda Nube #' + str(order['number']) + ' - ID: ' + str(order['id'])
                 self.json_tn = order
                 self.id_tn = order['id']
                 self.number_tn = order['number']
