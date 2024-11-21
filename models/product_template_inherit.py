@@ -32,7 +32,15 @@ class TiendaNubeProductTemplateInherit(models.Model):
     def update_stock_tn(self):
         for product in self:
             if product.id_tn:
-                self.env.user.company_id.update_product_stock_tn(product)
+                #Obtenemos los almacenes de la compañia que tenga location_id_tn
+                warehouses = self.env['stock.warehouse'].search([('location_id_tn', '!=', False)])
+                location_id_tn = []
+                for warehouse in warehouses:
+                    location_id_tn.append(warehouse.location_id_tn)
+                if len(location_id_tn) == 0:
+                    return
+
+                self.env.user.company_id.update_product_stock_tn(product, location_id_tn)
 
     # Metodo para crear el producto en TN
     def create_tn(self):
@@ -188,8 +196,6 @@ class TiendaNubeProductTemplateInherit(models.Model):
                         'sexo_tn': variant['gender'],
                         'barcode': variant['barcode'] if not product_barcode_exist else False,
                         'default_code': variant['sku'],
-                        'inventory_level_id_tn': variant['inventory_levels'][0]['id'],
-                        'location_id_tn': variant['inventory_levels'][0]['location_id'],
                     })
             _logger.info("********** Finalizacion de creacion: %s", self.name)
 

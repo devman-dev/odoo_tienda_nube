@@ -211,8 +211,6 @@ class TiendaNubeResCompanyInherit(models.Model):
                         'sexo_tn': variant['gender'],
                         'barcode': variant['barcode'] if not product_barcode_exist else False,
                         'default_code': variant['sku'],
-                        'inventory_level_id_tn': variant['inventory_levels'][0]['id'],
-                        'location_id_tn': variant['inventory_levels'][0]['location_id'],
                     })
             _logger.info("********** Finalizacion de creacion/actualizacion: %s", product_template_odoo.name)
 
@@ -265,7 +263,7 @@ class TiendaNubeResCompanyInherit(models.Model):
                     raise ValidationError('Error al actualizar stock de Tienda Nube: %s' % response.text)
 
     #Actualizamos stock de productos en TN con PATCH /products/stock-price
-    def update_product_stock_tn(self, products):
+    def update_product_stock_tn(self, products, location_id_tn):
         url = "https://api.tiendanube.com/v1/%s/products/stock-price" % self.tiendanube_id
         headers = self.get_headers_tn()
         _logger.info("Headers: %s", headers)
@@ -278,13 +276,18 @@ class TiendaNubeResCompanyInherit(models.Model):
         for product in products:
             data_variants = []
             for variant in product.product_variant_ids.filtered(lambda x: x.product_id_tn != False):
-                data_variants.append({
-                    'id': int(variant.product_id_tn),
-                    "inventory_levels": [{
-                        "location_id": variant.location_id_tn,
-                        "stock": int(variant.qty_available) if self.tn_config_stock == 'stock' else int(variant.virtual_available),
-                    }]
-                })
+                for location in location_id_tn:
+                    # Obtenemos stock de la ubicacion para el producto filtrando por qty_available o virtual_available para la ubicacion
+                    warehouse = self.env['stock.warehouse'].search([('location_id_tn', '=', location)])
+                    if warehouse:
+                        variant = variant.with_context(warehouse=warehouse.ids)
+                    data_variants.append({
+                        'id': int(variant.product_id_tn),
+                        "inventory_levels": [{
+                            "location_id": location,
+                            "stock": int(variant.qty_available) if self.tn_config_stock == 'stock' else int(variant.virtual_available),
+                        }]
+                    })
             
             total_variants += len(data_variants)
             data_products.append({
@@ -426,8 +429,6 @@ class TiendaNubeResCompanyInherit(models.Model):
             for v in data['variants']:
                 variant = product.product_variant_ids.filtered(lambda x: x.barcode == v['barcode'])
                 variant.product_id_tn = v['id']
-                variant.location_id_tn = v['inventory_levels'][0]['location_id']
-                variant.inventory_level_id_tn = v['inventory_levels'][0]['id']
         else:
             raise ValidationError('Error al crear producto en Tienda Nube: %s' % response.text)
 
@@ -535,3 +536,15 @@ class TiendaNubeResCompanyInherit(models.Model):
                 error_tn=response.text,
             )
             raise ValidationError('Error al obtener ordenes de Tienda Nube: %s' % response.text)
+
+    # Metodo para traer Almacenes y Ubicaciones de Tienda Nube a Odoo
+    def get_location_tn(self):
+        url = "https://api.tiendanube.com/v1/%s/locations" % self.tiendanube_id
+        headers = self.get_headers_tn()
+        response = requests.get(url, headers=headers)
+        if response.status_code == 200:
+            data = response.json()
+            _logger.info("Data: %s", data)
+            return data
+        else:
+            return False

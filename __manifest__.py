@@ -22,6 +22,7 @@
         "wizards/create_all_webhook_odoo_views.xml",
         "wizards/create_all_coupon_odoo_views.xml",
         "wizards/create_all_order_odoo_views.xml",
+        "wizards/get_tn_location_wizard_views.xml",
         "views/webhook_tn_view.xml",
         "views/res_company_inherit_view.xml",
         "views/menu_view.xml",
@@ -30,7 +31,8 @@
         "views/category_tn_view.xml",
         "views/sale_order_inherit_view.xml",
         "views/tn_log_views.xml",
-        "views/coupon_tn_views.xml"
+        "views/coupon_tn_views.xml",
+        "views/stock_warehouse_inherit_views.xml",
     ],
     "assets": {
         

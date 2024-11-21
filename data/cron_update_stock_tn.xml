@@ -14,8 +14,14 @@
 companies = model.search([('tiendanube_code','!=',False)])
 for company in companies:
   if not company.tn_config_stock_realtime:
-      products = env['product.product'].search([('product_id_tn', '!=', False)])
-      company.update_product_stock_tn(products)</field>
+    products = env['product.product'].search([('product_id_tn', '!=', False)])
+    #Obtenemos los almacenes de la compañia que tenga location_id_tn
+    warehouses = env['stock.warehouse'].search([('location_id_tn', '!=', False)])
+    location_id_tn = []
+    for warehouse in warehouses:
+      location_id_tn.append(warehouse.location_id_tn)
+    if len(location_id_tn) > 0:
+      company.update_product_stock_tn(products, location_id_tn)</field>
         </record>
     </data>
 </odoo>

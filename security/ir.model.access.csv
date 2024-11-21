@@ -9,3 +9,5 @@ access_create_all_orders_wizard,create_all_orders_wizard,model_create_all_orders
 access_category_tn,category_tn,model_category_tn,base.group_user,1,1,1,1
 access_tn_log,tn_log,model_tn_log,base.group_user,1,1,1,1
 access_coupon_tn,coupon_tn,model_coupon_tn,base.group_user,1,1,1,1
+access_get_tn_location_wizard_manager,get_tn_location_wizard_manager,model_get_tn_location_wizard,base.group_user,1,1,1,1
+access_get_tn_location_wizard_line_manager,get_tn_location_wizard_line_manager,model_get_tn_location_wizard_line,base.group_user,1,1,1,1

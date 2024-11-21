@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+        <record id="view_get_tn_location_wizard_form" model="ir.ui.view">
+            <field name="name">get.tn.location.wizard.form</field>
+            <field name="model">get.tn.location.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Asignar ID de Almacenes">
+                        <h3>Sincroniza los almacenes correspondientes</h3>
+                        <group>
+                            <field name="locations_ids">
+                                <tree string="Almacenes" editable="top">
+                                    <field name="location_id" readonly="1"/>
+                                    <field name="warehouse_id"/>
+                                </tree>
+                            </field>
+                        </group>
+                        <button name="get_all_location" string="Obtener Almacenes de TN" type="object" class="btn-primary"/>
+
+                    <footer>
+                        <button name="set_location" string="Sincronizar" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+
+
+</odoo>

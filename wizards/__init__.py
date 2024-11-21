@@ -5,3 +5,4 @@ from . import create_all_category_odoo
 from . import create_all_webhook_odoo
 from . import create_all_coupon_odoo
 from . import create_all_order_odoo
+from . import get_tn_location_wizard

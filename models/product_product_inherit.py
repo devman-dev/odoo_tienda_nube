@@ -30,8 +30,6 @@ class TiendaNubeProductProductInherit(models.Model):
         ('male', 'Masculino'),
         ('female', 'Femenino'),
     ], string='Sexo', help="Sexo en Tienda Nube", default='unisex')
-    inventory_level_id_tn = fields.Char('ID Nivel de Inventario', help="ID de Nivel de Inventario en Tienda Nube", copy=False)
-    location_id_tn = fields.Char('ID Ubicación', help="ID de Ubicación en Tienda Nube", copy=False)
 
     # Sobreescribimos unlink para que no se pueda borrar producto de descuento de Tienda Nube
     def unlink(self):

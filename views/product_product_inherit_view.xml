@@ -16,8 +16,6 @@
                     <field name="mpn_tn" />
                     <field name="rango_edad_tn" />
                     <field name="sexo_tn" />
-                    <field name="inventory_level_id_tn" readonly="1"/>
-                    <field name="location_id_tn" readonly="1"/>
                 </xpath>
                 
             </field>
