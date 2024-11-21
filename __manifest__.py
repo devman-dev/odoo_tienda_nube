@@ -4,9 +4,9 @@
     "summary": """
         Conector de Tienda Nube con Odoo""",
     "category": "Sale",
-    "version": "16.0.1",
-    "website": "https://autodidactati.com",
-    "author": "Iván Arriola - Autodidacta TI",
+    "version": "15.0.1",
+    "website": "https://devoo.io",
+    "author": "Iván Arriola - Devoo",
     "license": "LGPL-3",
     "depends": [
         "base",
