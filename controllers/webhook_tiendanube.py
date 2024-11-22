@@ -188,6 +188,22 @@ class TiendaNubeWebHook(http.Controller):
                             order.sudo().create_order_from_tn()
                         exitoso = True
 
+                    #order/paid
+                    elif webhook.event == 'order/paid':
+                        #Buscamos la orden en Odoo y si no existe la creamos
+                        order = request.env['sale.order'].sudo().search([
+                            ('id_tn','=',data['id'])
+                            ],limit=1)
+                        if not order:
+                            #Asignamos de forma temporal como cliente a la empresa para poder crear la orden
+                            order = request.env['sale.order'].sudo().create({
+                                'id_tn': data['id'],
+                                'partner_id': request.env.company.sudo().partner_id.id,
+                                'name': 'Orden TN id: ' + str(data['id']),
+                            })
+                            order.sudo().create_order_from_tn()
+                        exitoso = True
+
                 if exitoso:
                     return request.make_response(
                         json.dumps({"mensaje": "Operación exitosa"}),
