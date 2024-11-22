@@ -14,6 +14,198 @@ class TiendaNubeProductTemplateInherit(models.Model):
     mostrar_en_tienda_tn = fields.Boolean('Mostrar en Tienda Nube', help="Indica si el producto se mostrará en Tienda Nube")
     categoria_tn_ids = fields.Many2many('category.tn', string='Categorias Tienda Nube', help="Categorias de Tienda Nube")
 
+    #Campos de variables
+    precio_promocional_tn = fields.Float('Precio Promocional Tienda Nube', help="Precio promocional de Tienda Nube", compute='_compute_precio_promocional_tn', inverse='_set_precio_promocional_tn')
+
+    #Dimensiones TN
+    alto_tn = fields.Float('Alto en CM', help="Alto en Tienda Nube", compute='_compute_alto_tn', inverse='_set_alto_tn')
+    ancho_tn = fields.Float('Ancho en CM', help="Ancho en Tienda Nube", compute='_compute_ancho_tn', inverse='_set_ancho_tn')
+    profundidad_tn = fields.Float('Profundidad en CM', help="Profundidad en Tienda Nube", compute='_compute_profundidad_tn', inverse='_set_profundidad_tn')
+    peso_tn = fields.Float('Peso en Kg', help="Peso en Tienda Nube", compute='_compute_peso_tn', inverse='_set_peso_tn')
+
+    #Instagram y Google Shopping
+    mpn_tn = fields.Char('MPN', help="MPN (Número de pieza del fabricante) en Tienda Nube", compute='_compute_mpn_tn', inverse='_set_mpn_tn')
+    rango_edad_tn = fields.Selection([
+        ('newborn', '0-3 Meses'),
+        ('infant', '3-12 Meses'),
+        ('toddler', '1-5 Años'),
+        ('kids', '5-13 Años'),
+        ('adult', 'Adulto'),
+    ], string='Rango de Edad', help="Rango de Edad en Tienda Nube", compute='_compute_rango_edad_tn', inverse='_set_rango_edad_tn')
+    sexo_tn = fields.Selection([
+        ('unisex', 'Unisex'),
+        ('male', 'Masculino'),
+        ('female', 'Femenino'),
+    ], string='Sexo', help="Sexo en Tienda Nube", default='unisex', compute='_compute_sexo_tn', inverse='_set_sexo_tn')
+
+    # precio_promocional_tn
+    @api.depends('product_variant_ids.precio_promocional_tn')
+    def _compute_precio_promocional_tn(self):
+        self.precio_promocional_tn = False
+        for template in self:
+            variant_count = len(template.product_variant_ids)
+            if variant_count == 1:
+                template.precio_promocional_tn = template.product_variant_ids.precio_promocional_tn
+            elif variant_count == 0:
+                archived_variants = template.with_context(active_test=False).product_variant_ids
+                if len(archived_variants) == 1:
+                    template.precio_promocional_tn = archived_variants.precio_promocional_tn
+    def _set_precio_promocional_tn(self):
+        variant_count = len(self.product_variant_ids)
+        if variant_count == 1:
+            self.product_variant_ids.precio_promocional_tn = self.precio_promocional_tn
+        elif variant_count == 0:
+            archived_variants = self.with_context(active_test=False).product_variant_ids
+            if len(archived_variants) == 1:
+                archived_variants.precio_promocional_tn = self.precio_promocional_tn
+
+    # sexo_tn
+    @api.depends('product_variant_ids.sexo_tn')
+    def _compute_sexo_tn(self):
+        self.sexo_tn = False
+        for template in self:
+            variant_count = len(template.product_variant_ids)
+            if variant_count == 1:
+                template.sexo_tn = template.product_variant_ids.sexo_tn
+            elif variant_count == 0:
+                archived_variants = template.with_context(active_test=False).product_variant_ids
+                if len(archived_variants) == 1:
+                    template.sexo_tn = archived_variants.sexo_tn
+    def _set_sexo_tn(self):
+        variant_count = len(self.product_variant_ids)
+        if variant_count == 1:
+            self.product_variant_ids.sexo_tn = self.sexo_tn
+        elif variant_count == 0:
+            archived_variants = self.with_context(active_test=False).product_variant_ids
+            if len(archived_variants) == 1:
+                archived_variants.sexo_tn = self.sexo_tn
+
+    # rango_edad_tn
+    @api.depends('product_variant_ids.rango_edad_tn')
+    def _compute_rango_edad_tn(self):
+        self.rango_edad_tn = False
+        for template in self:
+            variant_count = len(template.product_variant_ids)
+            if variant_count == 1:
+                template.rango_edad_tn = template.product_variant_ids.rango_edad_tn
+            elif variant_count == 0:
+                archived_variants = template.with_context(active_test=False).product_variant_ids
+                if len(archived_variants) == 1:
+                    template.rango_edad_tn = archived_variants.rango_edad_tn
+    def _set_rango_edad_tn(self):
+        variant_count = len(self.product_variant_ids)
+        if variant_count == 1:
+            self.product_variant_ids.rango_edad_tn = self.rango_edad_tn
+        elif variant_count == 0:
+            archived_variants = self.with_context(active_test=False).product_variant_ids
+            if len(archived_variants) == 1:
+                archived_variants.rango_edad_tn = self.rango_edad_tn
+
+    # mpn_tn
+    @api.depends('product_variant_ids.mpn_tn')
+    def _compute_mpn_tn(self):
+        self.mpn_tn = False
+        for template in self:
+            variant_count = len(template.product_variant_ids)
+            if variant_count == 1:
+                template.mpn_tn = template.product_variant_ids.mpn_tn
+            elif variant_count == 0:
+                archived_variants = template.with_context(active_test=False).product_variant_ids
+                if len(archived_variants) == 1:
+                    template.mpn_tn = archived_variants.mpn_tn
+    def _set_mpn_tn(self):
+        variant_count = len(self.product_variant_ids)
+        if variant_count == 1:
+            self.product_variant_ids.mpn_tn = self.mpn_tn
+        elif variant_count == 0:
+            archived_variants = self.with_context(active_test=False).product_variant_ids
+            if len(archived_variants) == 1:
+                archived_variants.mpn_tn = self.mpn_tn
+
+    # alto_tn
+    @api.depends('product_variant_ids.alto_tn')
+    def _compute_alto_tn(self):
+        self.alto_tn = False
+        for template in self:
+            variant_count = len(template.product_variant_ids)
+            if variant_count == 1:
+                template.alto_tn = template.product_variant_ids.alto_tn
+            elif variant_count == 0:
+                archived_variants = template.with_context(active_test=False).product_variant_ids
+                if len(archived_variants) == 1:
+                    template.alto_tn = archived_variants.alto_tn
+    def _set_alto_tn(self):
+        variant_count = len(self.product_variant_ids)
+        if variant_count == 1:
+            self.product_variant_ids.alto_tn = self.alto_tn
+        elif variant_count == 0:
+            archived_variants = self.with_context(active_test=False).product_variant_ids
+            if len(archived_variants) == 1:
+                archived_variants.alto_tn = self.alto_tn
+
+    #ancho_tn
+    @api.depends('product_variant_ids.ancho_tn')
+    def _compute_ancho_tn(self):
+        self.ancho_tn = False
+        for template in self:
+            variant_count = len(template.product_variant_ids)
+            if variant_count == 1:
+                template.ancho_tn = template.product_variant_ids.ancho_tn
+            elif variant_count == 0:
+                archived_variants = template.with_context(active_test=False).product_variant_ids
+                if len(archived_variants) == 1:
+                    template.ancho_tn = archived_variants.ancho_tn
+    def _set_ancho_tn(self):
+        variant_count = len(self.product_variant_ids)
+        if variant_count == 1:
+            self.product_variant_ids.ancho_tn = self.ancho_tn
+        elif variant_count == 0:
+            archived_variants = self.with_context(active_test=False).product_variant_ids
+            if len(archived_variants) == 1:
+                archived_variants.ancho_tn = self.ancho_tn
+
+    #profundidad_tn
+    @api.depends('product_variant_ids.profundidad_tn')
+    def _compute_profundidad_tn(self):
+        self.profundidad_tn = False
+        for template in self:
+            variant_count = len(template.product_variant_ids)
+            if variant_count == 1:
+                template.profundidad_tn = template.product_variant_ids.profundidad_tn
+            elif variant_count == 0:
+                archived_variants = template.with_context(active_test=False).product_variant_ids
+                if len(archived_variants) == 1:
+                    template.profundidad_tn = archived_variants.profundidad_tn
+    def _set_profundidad_tn(self):
+        variant_count = len(self.product_variant_ids)
+        if variant_count == 1:
+            self.product_variant_ids.profundidad_tn = self.profundidad_tn
+        elif variant_count == 0:
+            archived_variants = self.with_context(active_test=False).product_variant_ids
+            if len(archived_variants) == 1:
+                archived_variants.profundidad_tn = self.profundidad_tn
+
+    #peso_tn
+    @api.depends('product_variant_ids.peso_tn')
+    def _compute_peso_tn(self):
+        self.peso_tn = False
+        for template in self:
+            variant_count = len(template.product_variant_ids)
+            if variant_count == 1:
+                template.peso_tn = template.product_variant_ids.peso_tn
+            elif variant_count == 0:
+                archived_variants = template.with_context(active_test=False).product_variant_ids
+                if len(archived_variants) == 1:
+                    template.peso_tn = archived_variants.peso_tn
+    def _set_peso_tn(self):
+        variant_count = len(self.product_variant_ids)
+        if variant_count == 1:
+            self.product_variant_ids.peso_tn = self.peso_tn
+        elif variant_count == 0:
+            archived_variants = self.with_context(active_test=False).product_variant_ids
+            if len(archived_variants) == 1:
+                archived_variants.peso_tn = self.peso_tn
+
     # Sobreescribimos unlink para que no se pueda borrar producto de descuento de Tienda Nube
     def unlink(self):
         product_discount_tn = self.env.ref('tiendanube_odoo.product_discount_tn_product_template')

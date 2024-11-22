@@ -17,6 +17,14 @@
                     <field name="id_tn" readonly="1"/>
                     <field name="envio_gratis_tn"/>
                     <field name="mostrar_en_tienda_tn"/>
+                    <field name="precio_promocional_tn" attrs="{'invisible': [('product_variant_count', '>', 1)]}"/>
+                    <field name="alto_tn" attrs="{'invisible': [('product_variant_count', '>', 1)]}"/>
+                    <field name="ancho_tn" attrs="{'invisible': [('product_variant_count', '>', 1)]}"/>
+                    <field name="profundidad_tn" attrs="{'invisible': [('product_variant_count', '>', 1)]}"/>
+                    <field name="peso_tn" attrs="{'invisible': [('product_variant_count', '>', 1)]}"/>
+                    <field name="mpn_tn" attrs="{'invisible': [('product_variant_count', '>', 1)]}"/>
+                    <field name="rango_edad_tn" attrs="{'invisible': [('product_variant_count', '>', 1)]}"/>
+                    <field name="sexo_tn" attrs="{'invisible': [('product_variant_count', '>', 1)]}"/>
                 </field>
                 
             </field>
