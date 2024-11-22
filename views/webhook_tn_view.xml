@@ -5,11 +5,11 @@
             <field name="name">webhook.tn.form</field>
             <field name="model">webhook.tn</field>
             <field name="arch" type="xml">
-                <header>
-                    <button name="create_or_update_webhook_tn" string="Crear/Actualizar en Tienda Nube" type="object" class="oe_highlight"/>
-                    <button name="delete_webhook_tn" string="Eliminar de Tienda Nube" type="object" class="oe_highlight" confirm="¿Realmente desea eliminar este Webhook de tienda nube?"/>
-                </header>
                 <form>
+                    <header>
+                        <button name="create_or_update_webhook_tn" string="Crear/Actualizar en Tienda Nube" type="object" class="oe_highlight"/>
+                        <button name="delete_webhook_tn" string="Eliminar de Tienda Nube" type="object" class="oe_highlight" confirm="¿Realmente desea eliminar este Webhook de tienda nube?"/>
+                    </header>
                     <sheet>
                         <group>
                             <group>
