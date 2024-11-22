@@ -20,7 +20,7 @@ class WebhookTN(models.Model):
         ('order/created', 'Orden creada'),
         ('order/updated', 'Orden actualizada'),
         ('order/edited', 'Orden editada'),
-        ('order/paid', 'Orden paganada'),
+        ('order/paid', 'Orden pagada'),
         ('order/cancelled', 'Orden cancelada'),
         ('order/fulfilled', 'Orden completada'),
         ('order/packed', 'Orden empaquetada'),
