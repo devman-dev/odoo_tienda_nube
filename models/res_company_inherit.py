@@ -427,7 +427,7 @@ class TiendaNubeResCompanyInherit(models.Model):
             product.id_tn = data['id']
             #asignamos el id de Tienda Nube a cada variante
             for v in data['variants']:
-                variant = product.product_variant_ids.filtered(lambda x: x.barcode == v['barcode'])
+                variant = product.product_variant_ids.filtered(lambda x: x.barcode.replace(' ', '') == v['barcode'])
                 variant.product_id_tn = v['id']
         else:
             raise ValidationError('Error al crear producto en Tienda Nube: %s' % response.text)
