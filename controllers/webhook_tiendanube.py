@@ -11,7 +11,7 @@ from odoo.http import request
 
 _logger = logging.getLogger(__name__)
 CORS = '*'
-CLIENT_SECRET = 'cb98cf7830c4e366a962ac56e554c12d9c4c188ed1f2ab62'
+VERIFICATION_CODE = 'cb98cf7830c4e366a962ac56e554c12d9c4c188ed1f2ab62'
 
 class TiendaNubeWebHook(http.Controller):
 
@@ -21,15 +21,12 @@ class TiendaNubeWebHook(http.Controller):
         webhook_received = request.env['webhook.tn.received'].sudo().search([
             ('id_event_tn','=',data['id']),('event','=',data['event']),('store_id','=',data['store_id'])
             ],limit=1, order='create_date desc')
-        _logger.info('******* webhook_received: %s' % webhook_received)
-        _logger.info('******* odoo.fields.Datetime.now: %s' % odoo.fields.Datetime.now())
-        _logger.info('******* webhook_received.create_date: %s' % webhook_received.create_date)
         if webhook_received and (odoo.fields.Datetime.now() - webhook_received.create_date).seconds < 3:
             return True
         return False
 
     def verify_webhook(self, data, hmac_header):
-        calculated_hmac = hmac.new(CLIENT_SECRET.encode('utf-8'), data, hashlib.sha256).hexdigest()
+        calculated_hmac = hmac.new(VERIFICATION_CODE.encode('utf-8'), data, hashlib.sha256).hexdigest()
         return hmac.compare_digest(calculated_hmac, hmac_header)
 
     #Controller para descargar adjuntos

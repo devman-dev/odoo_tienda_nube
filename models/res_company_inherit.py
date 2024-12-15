@@ -7,13 +7,9 @@ import base64
 
 _logger = logging.getLogger(__name__)
 
-APP_ID = '11517'
-CLIENT_SECRET = 'cb98cf7830c4e366a962ac56e554c12d9c4c188ed1f2ab62'
-
 class TiendaNubeResCompanyInherit(models.Model):
     _inherit = "res.company"
 
-    tiendanube_code = fields.Char('Tienda Nube Code', help="Codigo de autorizacion de Tienda Nube")
     tiendanube_access_token = fields.Char('Tienda Nube Access Token', help="Token otorgado por Tienda Nube")
     tiendanube_id = fields.Char('Tienda Nube User ID', help="ID de Tienda Nube")
     tn_config_stock = fields.Selection([
@@ -43,29 +39,6 @@ class TiendaNubeResCompanyInherit(models.Model):
             "Content-Type": "application/json",
             "User-Agent": "Odoo (admin@musculandiasport.com)",
         }
-
-    #Autorizamos aplicacion de Tienda Nube
-    #https://dev.tiendanube.com/docs/applications/authentication
-    def authorize_tienda_nube(self):
-        url = "https://www.tiendanube.com/apps/authorize/token"
-        payload = {
-            "client_id": APP_ID,
-            "client_secret": CLIENT_SECRET,
-            "code": self.tiendanube_code,
-            "grant_type": "authorization_code"
-        }
-        response = requests.post(url, data=payload)
-        _logger.info("Response: %s", response)
-        _logger.info("Response: %s", response.text)
-        if response.status_code == 200:
-            data = response.json()
-
-            #Verificamos si tenemos error
-            if 'error' in data:
-                raise ValidationError('Error al autorizar la aplicacion: %s' % data['error'] + '. Descripcion: %s' % data['error_description'])
-
-            self.tiendanube_access_token = data['access_token']
-            self.tiendanube_id = data['user_id']
 
     #Creamos productos de TN en Odoo
     def create_products_in_odoo(self):

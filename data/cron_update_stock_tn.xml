@@ -11,7 +11,7 @@
             <field name="active" eval="True"/>
             <field name="user_id" ref="base.user_root"/>
             <field name="code">
-companies = model.search([('tiendanube_code','!=',False)])
+companies = model.search([('tiendanube_access_token','!=',False)])
 for company in companies:
   if not company.tn_config_stock_realtime:
     products = env['product.product'].search([('product_id_tn', '!=', False)])
