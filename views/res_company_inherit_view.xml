@@ -8,12 +8,10 @@
             <xpath expr="//notebook" position="inside">
                 <page name="TN" string="Tienda Nube">
                     <group>
-                        <field name="tiendanube_code" />
-                        <field name="tiendanube_id" readonly="1"/>
-                        <field name="tiendanube_access_token" readonly="1"/>
+                        <field name="tiendanube_id" />
+                        <field name="tiendanube_access_token" />
                         <field name="tn_config_stock"/>
                         <field name="tn_config_stock_realtime"/>
-                        <button string="Habilitar APP en Tienda Nube" name="authorize_tienda_nube" type="object" class="oe_highlight"/>
                     </group>
                     <group>
                     </group>
