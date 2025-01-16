@@ -11,7 +11,6 @@ from odoo.http import request
 
 _logger = logging.getLogger(__name__)
 CORS = '*'
-VERIFICATION_CODE = 'cb98cf7830c4e366a962ac56e554c12d9c4c188ed1f2ab62'
 
 class TiendaNubeWebHook(http.Controller):
 
@@ -24,10 +23,6 @@ class TiendaNubeWebHook(http.Controller):
         if webhook_received and (odoo.fields.Datetime.now() - webhook_received.create_date).seconds < 3:
             return True
         return False
-
-    def verify_webhook(self, data, hmac_header):
-        calculated_hmac = hmac.new(VERIFICATION_CODE.encode('utf-8'), data, hashlib.sha256).hexdigest()
-        return hmac.compare_digest(calculated_hmac, hmac_header)
 
     #Controller para descargar adjuntos
     @http.route('/webhook_tn/<string:code_event>', auth='public', cors=CORS, csrf=False)
@@ -69,20 +64,6 @@ class TiendaNubeWebHook(http.Controller):
                     'store_id': data['store_id'],
                 })
                 request.env.cr.commit()
-
-            # Encabezado HMAC de la solicitud para verificar la autenticidad de la solicitud
-            hmac_header = request.httprequest.headers.get('X-LINKEDSTORE-HMAC-SHA256')
-            if not hmac_header:
-                hmac_header = request.httprequest.headers.get('HTTP-X-LINKEDSTORE-HMAC-SHA256')
-            if self.verify_webhook(request.httprequest.get_data(), hmac_header):
-                _logger.info('*********** HMAC correcto')
-            else:
-                _logger.info('*********** HMAC incorrecto')
-                return request.make_response(
-                    json.dumps({"mensaje": "Firma incorrecta"}),
-                    headers={'Content-Type': 'application/json'},
-                    status=400
-                )
 
             if 'code_event' in kw:
                 code_event = kw['code_event']
