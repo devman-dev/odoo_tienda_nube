@@ -18,11 +18,11 @@
             <field name="name">category.tn.form</field>
             <field name="model">category.tn</field>
             <field name="arch" type="xml">
-                <header>
-                    <button name="create_or_update_tn" string="Crear/Actualizar en Tienda Nube" type="object" class="oe_highlight"/>
-                    <button name="update_category_tn_odoo" string="Editar desde Tienda Nube" type="object" class="oe_highlight"/>
-                </header>
                 <form>
+                    <header>
+                        <button name="create_or_update_tn" string="Crear/Actualizar en Tienda Nube" type="object" class="oe_highlight"/>
+                        <button name="update_category_tn_odoo" string="Editar desde Tienda Nube" type="object" class="oe_highlight"/>
+                    </header>
                     <sheet>
                         <group>
                             <group>
