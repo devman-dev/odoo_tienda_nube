@@ -56,8 +56,6 @@ class CategoryTn(models.Model):
                 parent = False
                 if response_data['parent'] != 0:
                     parent = rec.search([('tn_id', '=', response_data['parent'])], limit=1)
-                    if parent:
-                        parent = False
                 rec.parent_id = parent
             else:
                 raise UserError("Error al sincronizar con Tienda Nube")
