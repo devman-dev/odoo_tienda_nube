@@ -16,6 +16,7 @@ class TiendaNubeResCompanyInherit(models.Model):
         ('stock', 'Stock en mano'),
         ('stock-price', 'Stock pronosticado'),
     ], string='Configuracion de Stock', default='stock', help="Si es 'Stock en mano' se actualiza el stock en base a la cantidad en mano, si es 'Stock pronosticado' se actualiza el stock en base a la cantidad pronosticada")
+    tn_config_confirmation_sale = fields.Boolean('Confirmar venta', help="Si esta activo se confirma la venta al crear la orden de venta, sino se deja en estado borrador")
     tn_config_stock_realtime = fields.Boolean('Stock en tiempo real', help="Si esta activo se actualiza el stock en tiempo real, sino se actualiza cada 30 minutos")
     def get_all_products_tn(self):
         url = "https://api.tiendanube.com/v1/%s/products" % self.tiendanube_id
@@ -37,7 +38,6 @@ class TiendaNubeResCompanyInherit(models.Model):
         return {
             "Authentication": "bearer " + self.tiendanube_access_token,
             "Content-Type": "application/json",
-            "User-Agent": "Odoo (admin@musculandiasport.com)",
         }
 
     #Creamos productos de TN en Odoo
