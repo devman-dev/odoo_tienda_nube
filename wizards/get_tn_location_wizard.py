@@ -10,6 +10,9 @@ class GetTnLocationWizard(models.TransientModel):
     locations_ids = fields.One2many('get.tn.location.wizard.line', 'wizard_id', 'Ubicaciones en Tienda Nube')
 
     def set_location(self):
+        #Eliinamos los location_id_tn actuales
+        warehouse_ids = self.env['stock.warehouse'].search([('location_id_tn','!=',False)])
+        warehouse_ids.location_id_tn = False
         for location in self.locations_ids:
             if location.location_id and location.warehouse_id:
                 #Obtenemos solo el ID del chat location_id
