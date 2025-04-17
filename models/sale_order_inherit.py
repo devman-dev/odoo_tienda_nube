@@ -64,7 +64,7 @@ class SaleOrderTiendaNubeInherit(models.Model):
             _logger.info("Create Order from TN")
             company = self.env.user.company_id
             headers = company.get_headers_tn()
-            url = "https://api.tiendanube.com/v1/%s/orders/%s" % (company.tiendanube_id, self.id_tn)
+            url = "https://api.tiendanube.com/v1/%s/orders/%s?aggregates=fulfillment_orders" % (company.tiendanube_id, self.id_tn)
             response = requests.get(url, headers=headers)
             _logger.info("Response: %s", response.text)
             if response.status_code == 200:
@@ -72,7 +72,13 @@ class SaleOrderTiendaNubeInherit(models.Model):
                 _logger.info("Data: %s", order)
 
                 # Datos de la orden
-                created_at = datetime.strptime(order['created_at'], '%Y-%m-%dT%H:%M:%S%z')
+                #verificamos por potencial error de Tienda Nube que la fecha no sea nula por ejemplo "-0001-11-30T00:00:00+0000", de ser incorrecta tomamos la fecha del dia
+                if order['created_at'] == "-0001-11-30T00:00:00+0000":
+                    order['created_at'] = datetime.now().strftime('%Y-%m-%dT%H:%M:%S%z')
+                try:
+                    created_at = datetime.strptime(order['created_at'], '%Y-%m-%dT%H:%M:%S%z')
+                except ValueError:
+                    created_at = datetime.strptime(order['created_at'], '%Y-%m-%dT%H:%M:%S')
                 self.date_order = created_at.strftime('%Y-%m-%d %H:%M:%S')
                 self.name = 'Tienda Nube #' + str(order['number']) + ' - ID: ' + str(order['id'])
                 self.json_tn = order
@@ -204,6 +210,14 @@ class SaleOrderTiendaNubeInherit(models.Model):
                                 'product_uom_qty': -1,
                                 'price_unit': promotions_applied['total_discount_amount'],
                             }).write({'tax_id': False})
+
+                #Verificamos si hay Almacen de salida
+                if len(order['fulfillments']) > 0:
+                    # Buscamos el Almacen de salida
+                    warehouse_id = self.env['stock.warehouse'].search([('location_id_tn', '=', order['fulfillments'][0]['assigned_location']['location_id'])], limit=1)
+                    if not warehouse_id:
+                        raise ValidationError(_("Almacen de salida no encontrada en Odoo"))
+                    self.warehouse_id = warehouse_id.id
 
                 # Creamos un log
                 self.env['tn.log'].create_log('Orden de venta {0} creada'.format(self.name), 'Orden de Venta creada desde Tienda Nube', 'sale.order', self.id, 'success')
