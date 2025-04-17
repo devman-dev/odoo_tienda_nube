@@ -10,6 +10,7 @@
                     <group>
                         <field name="tiendanube_id" />
                         <field name="tiendanube_access_token" />
+                        <field name="tn_config_confirmation_sale"/>
                         <field name="tn_config_stock"/>
                         <field name="tn_config_stock_realtime"/>
                     </group>

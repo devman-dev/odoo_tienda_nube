@@ -6,11 +6,9 @@
             <field name="model">sale.order</field>
             <field name="inherit_id" ref="sale.view_order_form"/>
             <field name="arch" type="xml">
-                <header position="inside">
-                    <button name="create_order_from_tn" string="Crear orden desde Tienda Nube" type="object" class="oe_highlight"/>
-                </header>
                 <notebook position="inside">
                     <page string="Tienda Nube">
+                        <button name="create_order_from_tn" string="Crear / Actualizar orden desde Tienda Nube" type="object" class="oe_highlight"/>
                         <group>
                             <group string="Datos Principales">
                                 <field name="id_tn"/>

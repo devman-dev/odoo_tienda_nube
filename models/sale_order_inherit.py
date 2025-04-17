@@ -60,6 +60,8 @@ class SaleOrderTiendaNubeInherit(models.Model):
 
     # Metodo para crear la orden en Odoo desde TN GET /orders/{id}
     def create_order_from_tn(self):
+        if self.state != 'draft':
+            raise ValidationError(_("La orden de venta debe estar en estado Borrador para poder ser editada por Tienda Nube"))
         try:
             _logger.info("Create Order from TN")
             company = self.env.user.company_id
@@ -70,6 +72,12 @@ class SaleOrderTiendaNubeInherit(models.Model):
             if response.status_code == 200:
                 order = response.json()
                 _logger.info("Data: %s", order)
+
+                # Limpiamos lineas de la orden en el caso de que se este actualizando a fuerza
+                if self.state == 'draft':
+                    for line in self.order_line:
+                        line.unlink()
+
 
                 # Datos de la orden
                 #verificamos por potencial error de Tienda Nube que la fecha no sea nula por ejemplo "-0001-11-30T00:00:00+0000", de ser incorrecta tomamos la fecha del dia
@@ -218,6 +226,10 @@ class SaleOrderTiendaNubeInherit(models.Model):
                     if not warehouse_id:
                         raise ValidationError(_("Almacen de salida no encontrada en Odoo"))
                     self.warehouse_id = warehouse_id.id
+
+                # Verificamos si debemos confirmar la orden
+                if self.company_id.tn_config_confirmation_sale:
+                    self.action_confirm()
 
                 # Creamos un log
                 self.env['tn.log'].create_log('Orden de venta {0} creada'.format(self.name), 'Orden de Venta creada desde Tienda Nube', 'sale.order', self.id, 'success')
