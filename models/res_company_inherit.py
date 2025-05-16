@@ -199,6 +199,7 @@ class TiendaNubeResCompanyInherit(models.Model):
                 "categories" : categorias,
                 "published": product.mostrar_en_tienda_tn,
                 "free_shipping": product.envio_gratis_tn,
+                "description": product.description_sale,
                 "name": product.name,
             }
             _logger.info("data: %s", data)
@@ -399,11 +400,34 @@ class TiendaNubeResCompanyInherit(models.Model):
             data = response.json()
             product.id_tn = data['id']
             #asignamos el id de Tienda Nube a cada variante
+            # Variable position para utilizar como bandera e identificar la posicion de las imagenes en el arreglo image devuelto
+            position = 0
             for v in data['variants']:
                 variant = product.product_variant_ids.filtered(lambda x: x.barcode.replace(' ', '') == v['barcode'])
                 variant.product_id_tn = v['id']
+                #Modificamos la imagenes de la variante en tienda nube
+                url_put_image = "https://api.tiendanube.com/v1/%s/products/%s/variants/%s" % (self.tiendanube_id, v['product_id'], v['id'])
+                data_variant_image = {
+                    "image_id": data['images'][position]['id'],
+                }
+                response_image_variant = requests.put(url_put_image, headers=headers, json=data_variant_image)
+                _logger.info("Response: %s", response_image_variant.text)
+                position += 1
+
         else:
             raise ValidationError('Error al crear producto en Tienda Nube: %s' % response.text)
+        # Hacemos un commit y procedemos a actulizar stock por warehouse
+        self.env.cr.commit()
+        # Buscamos los wharehouse que tengan location_id_tn
+        location_id_tn = []
+        wharehouse = self.env['stock.warehouse'].sudo().search([('location_id_tn', '!=', False)])
+        for wh in wharehouse:
+            location_id_tn.append(wh.location_id_tn)
+        if not location_id_tn[0]:
+            return
+        # Actualizamos el stock en Tienda Nube
+        self.update_product_stock_tn(product, location_id_tn)
+
 
     # Metodo para obtener webooks de Tienda Nube
     def get_webhooks_tn(self):
