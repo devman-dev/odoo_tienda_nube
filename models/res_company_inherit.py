@@ -38,6 +38,7 @@ class TiendaNubeResCompanyInherit(models.Model):
         return {
             "Authentication": "bearer " + self.tiendanube_access_token,
             "Content-Type": "application/json",
+            "User-Agent": "Odoo by Devoo"
         }
 
     #Creamos productos de TN en Odoo
@@ -343,11 +344,15 @@ class TiendaNubeResCompanyInherit(models.Model):
         # Obtenemos url de Odoo desde los parametros de sistema
         url_odoo = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
         images = []
+        cant_images = 1 # Contador de imagenes, como maximo se pueden subir 9 imagenes a TN
         for variant in product.product_variant_ids:
             if variant.image_1920:
                 images.append({
                     "src": url_odoo + '/ati_tn_product_template_ids/' + str(variant.id),
                 })
+            cant_images += 1
+            if cant_images == 9:
+                break
 
         categorias = []
         for category in product.categoria_tn_ids:
@@ -405,13 +410,14 @@ class TiendaNubeResCompanyInherit(models.Model):
             for v in data['variants']:
                 variant = product.product_variant_ids.filtered(lambda x: x.barcode.replace(' ', '') == v['barcode'])
                 variant.product_id_tn = v['id']
-                #Modificamos la imagenes de la variante en tienda nube
-                url_put_image = "https://api.tiendanube.com/v1/%s/products/%s/variants/%s" % (self.tiendanube_id, v['product_id'], v['id'])
-                data_variant_image = {
-                    "image_id": data['images'][position]['id'],
-                }
-                response_image_variant = requests.put(url_put_image, headers=headers, json=data_variant_image)
-                _logger.info("Response: %s", response_image_variant.text)
+                if 'images' in data and len(data['images']) > 0:
+                    #Modificamos la imagenes de la variante en tienda nube
+                    url_put_image = "https://api.tiendanube.com/v1/%s/products/%s/variants/%s" % (self.tiendanube_id, v['product_id'], v['id'])
+                    data_variant_image = {
+                        "image_id": data['images'][position]['id'],
+                    }
+                    response_image_variant = requests.put(url_put_image, headers=headers, json=data_variant_image)
+                    _logger.info("Response: %s", response_image_variant.text)
                 position += 1
 
         else:
