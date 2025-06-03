@@ -34,13 +34,17 @@ class WebhookTN(models.Model):
     # Validamos en el wirte y create que la url inicie de forma correcta siendo la url de odoo que figura en paramentros de sistema continuando con /webhook_tn
     @api.model
     def create(self, vals):
-        if vals.get('url') and not vals.get('url').startswith(self.env['ir.config_parameter'].sudo().get_param('web.base.url') + '/webhook_tn'):
+        if vals.get('url') and not vals.get('url').startswith(self.env['ir.config_parameter'].sudo().get_param('web.base.url') + '/webhook_tn/'):
             raise ValidationError('La URL debe iniciar con %s/webhook_tn/' % self.env['ir.config_parameter'].sudo().get_param('web.base.url'))
+        elif vals.get('url') == self.env['ir.config_parameter'].sudo().get_param('web.base.url') + '/webhook_tn/':
+            raise ValidationError('La URL no puede ser la misma que la de Odoo + /webhook_tn/, debe ser de esta manera mas algo por ejemplo: %s/webhook_tn/mi_webhook' % self.env['ir.config_parameter'].sudo().get_param('web.base.url'))
         return super(WebhookTN, self).create(vals)
 
     def write(self, vals):
-        if vals.get('url') and not vals.get('url').startswith(self.env['ir.config_parameter'].sudo().get_param('web.base.url') + '/webhook_tn'):
+        if vals.get('url') and not vals.get('url').startswith(self.env['ir.config_parameter'].sudo().get_param('web.base.url') + '/webhook_tn/'):
             raise ValidationError('La URL debe iniciar con %s/webhook_tn/' % self.env['ir.config_parameter'].sudo().get_param('web.base.url'))
+        elif vals.get('url') == self.env['ir.config_parameter'].sudo().get_param('web.base.url') + '/webhook_tn/':
+            raise ValidationError('La URL no puede ser la misma que la de Odoo + /webhook_tn, debe ser de esta manera mas algo por ejemplo: %s/webhook_tn/mi_webhook' % self.env['ir.config_parameter'].sudo().get_param('web.base.url'))
         return super(WebhookTN, self).write(vals)
 
 
