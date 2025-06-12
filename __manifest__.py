@@ -16,6 +16,7 @@
     "data": [
         "data/product_discount_tn.xml",
         "data/cron_update_stock_tn.xml",
+        "data/product_template_actions.xml",
         "security/ir.model.access.csv",
         "wizards/create_all_products_odoo_views.xml",
         "wizards/create_all_category_odoo_views.xml",
