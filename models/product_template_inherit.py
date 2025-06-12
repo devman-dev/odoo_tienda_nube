@@ -230,6 +230,18 @@ class TiendaNubeProductTemplateInherit(models.Model):
             if not product.id_tn:
                 self.env.user.company_id.create_product_tn(product)
 
+    # Metodo para desvincular producto de Tienda Nube
+    def unlink_tn(self):
+        for product in self:
+            for v in product.product_variant_ids:
+                v.write({
+                    'product_id_tn': False,
+                })
+
+            product.write({
+                'id_tn': False,
+            })
+
     # Metodo para crear/actualizar producto en Odoo desde TN por medio de id GET /products/{id}
     def create_update_product_from_tn(self):
 
