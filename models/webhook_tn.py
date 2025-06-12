@@ -11,6 +11,7 @@ class WebhookTN(models.Model):
     _description = 'Tienda Nube Webhook'
 
     name = fields.Char(string='Name', required=True)
+    company_id = fields.Many2one('res.company', string='Compañía', default=lambda self: self.env.user.company_id, required=True)
     id_webhook_tn = fields.Char(string='ID Tienda Nube')
     url = fields.Char(string='URL', required=True, help='URL del webhook en Tienda Nube')
     event = fields.Selection([
