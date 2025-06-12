@@ -8,55 +8,55 @@
             <field name="arch" type="xml">
                 <notebook position="inside">
                     <page string="Tienda Nube">
-                        <button name="create_order_from_tn" string="Crear / Actualizar orden desde Tienda Nube" type="object" class="oe_highlight"/>
+                        <button name="create_order_from_tn" string="Crear / Actualizar orden desde Tienda Nube" type="object" class="oe_highlight" attrs="{'invisible': [('state', '!=', 'draft')]}"/>
                         <group>
                             <group string="Datos Principales">
-                                <field name="id_tn"/>
-                                <field name="number_tn"/>
-                                <field name="token_tn"/>
-                                <field name="store_id_tn"/>
+                                <field name="id_tn" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                                <field name="number_tn" readonly="1"/>
+                                <field name="token_tn" readonly="1"/>
+                                <field name="store_id_tn" readonly="1"/>
                             </group>
                             <group string="Contacto cliente en Tienda Nube">
-                                <field name="contact_email_tn"/>
-                                <field name="contact_name_tn"/>
-                                <field name="contact_phone_tn"/>
-                                <field name="contact_identification_tn"/>
+                                <field name="contact_email_tn" readonly="1"/>
+                                <field name="contact_name_tn" readonly="1"/>
+                                <field name="contact_phone_tn" readonly="1"/>
+                                <field name="contact_identification_tn" readonly="1"/>
                             </group>
                         </group>
                         <group>
                             <group string="Envio">
-                                <field name="shipping_tn"/>
-                                <field name="shipping_cost_owner_tn"/>
-                                <field name="shipping_cost_customer_tn"/>
-                                <field name="shipping_min_days_tn"/>
-                                <field name="shipping_max_days_tn"/>
-                                <field name="shipping_option_tn"/>
-                                <field name="shipping_option_code_tn"/>
-                                <field name="shipping_option_reference_tn"/>
-                                <field name="shipping_pickup_details_tn"/>
-                                <field name="shipping_tracking_number_tn"/>
-                                <field name="shipping_tracking_url_tn"/>
-                                <field name="shipping_store_branch_name_tn"/>
-                                <field name="shipping_store_branch_extra_tn"/>
-                                <field name="shipping_pickup_type_tn"/>
+                                <field name="shipping_tn" readonly="1"/>
+                                <field name="shipping_cost_owner_tn" readonly="1"/>
+                                <field name="shipping_cost_customer_tn" readonly="1"/>
+                                <field name="shipping_min_days_tn" readonly="1"/>
+                                <field name="shipping_max_days_tn" readonly="1"/>
+                                <field name="shipping_option_tn" readonly="1"/>
+                                <field name="shipping_option_code_tn" readonly="1"/>
+                                <field name="shipping_option_reference_tn" readonly="1"/>
+                                <field name="shipping_pickup_details_tn" readonly="1"/>
+                                <field name="shipping_tracking_number_tn" readonly="1"/>
+                                <field name="shipping_tracking_url_tn" readonly="1"/>
+                                <field name="shipping_store_branch_name_tn" readonly="1"/>
+                                <field name="shipping_store_branch_extra_tn" readonly="1"/>
+                                <field name="shipping_pickup_type_tn" readonly="1"/>
                             </group>
                             <group string="Facturacion de cliente en Tienda Nube">
-                                <field name="billing_name_tn"/>
-                                <field name="billing_phone_tn"/>
-                                <field name="billing_address_tn"/>
-                                <field name="billing_number_tn"/>
-                                <field name="billing_floor_tn"/>
-                                <field name="billing_floor_tn"/>
-                                <field name="billing_locality_tn"/>
-                                <field name="billing_zipcode_tn"/>
-                                <field name="billing_city_tn"/>
-                                <field name="billing_province_tn"/>
-                                <field name="billing_country_tn"/>
-                                <field name="billing_customer_type_tn"/>
-                                <field name="billing_business_name_tn"/>
-                                <field name="billing_trade_name_tn"/>
-                                <field name="billing_state_registration_tn"/>
-                                <field name="billing_document_type_tn"/>
+                                <field name="billing_name_tn" readonly="1"/>
+                                <field name="billing_phone_tn" readonly="1"/>
+                                <field name="billing_address_tn" readonly="1"/>
+                                <field name="billing_number_tn" readonly="1"/>
+                                <field name="billing_floor_tn" readonly="1"/>
+                                <field name="billing_floor_tn" readonly="1"/>
+                                <field name="billing_locality_tn" readonly="1"/>
+                                <field name="billing_zipcode_tn" readonly="1"/>
+                                <field name="billing_city_tn" readonly="1"/>
+                                <field name="billing_province_tn" readonly="1"/>
+                                <field name="billing_country_tn" readonly="1"/>
+                                <field name="billing_customer_type_tn" readonly="1"/>
+                                <field name="billing_business_name_tn" readonly="1"/>
+                                <field name="billing_trade_name_tn" readonly="1"/>
+                                <field name="billing_state_registration_tn" readonly="1"/>
+                                <field name="billing_document_type_tn" readonly="1"/>
                             </group>
                         </group>
 
@@ -64,13 +64,13 @@
                         <notebook>
                             <page string="Descuentos">
                                 <group>
-                                    <field name="coupon_tn_ids" widget="many2many_tags"/>
+                                    <field name="coupon_tn_ids" widget="many2many_tags" readonly="1"/>
                                 </group>
                                 <group>
                                     <field name="promotions_applied_tn" readonly="1"/>
                                 </group>
                             </page>
-                            <page string="Log Json">
+                            <page string="Log Json" groups="base.group_no_one">
                                 <field name="json_tn" readonly="1"/>
                             </page>
                         </notebook>
