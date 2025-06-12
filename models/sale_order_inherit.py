@@ -154,13 +154,17 @@ class SaleOrderTiendaNubeInherit(models.Model):
                     if not product:
                         self.env.cr.rollback()
                         raise ValidationError(_("Producto '{0}' con codigo '{1}' en Tienda Nuve no encontrado en Odoo".format(line['name'], line['variant_id'])))
-                    
+                    #Verificamos si tenemos que quitar impuestos
+                    price_unit = float(line['price'])
+                    if self.company_id.tn_type_tax == 'not_included':
+                        value_tax = (((product.taxes_id.compute_all(price_unit)['total_included']) * 100) / (product.taxes_id.compute_all(price_unit)['total_excluded'])) / 100
+                        price_unit = price_unit / value_tax
                     self.env['sale.order.line'].create({
                         'name': line['name'],
                         'order_id': self.id,
                         'product_id': product.id,
                         'product_uom_qty': float(line['quantity']),
-                        'price_unit': float(line['price']),
+                        'price_unit': price_unit,
                     })
 
                 # DESCUENTOS

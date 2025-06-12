@@ -19,6 +19,10 @@ class TiendaNubeResCompanyInherit(models.Model):
     tn_config_confirmation_sale = fields.Boolean('Confirmar venta', help="Si esta activo se confirma la venta al crear la orden de venta, sino se deja en estado borrador")
     tn_config_stock_realtime = fields.Boolean('Stock en tiempo real', help="Si esta activo se actualiza el stock en tiempo real, sino se actualiza cada 30 minutos")
     tn_pricelist_id = fields.Many2one('product.pricelist', string='Lista de Precios Tienda Nube', help="Lista de precios que se usara para los productos de Tienda Nube", required=True)
+    tn_type_tax = fields.Selection([
+        ('included', 'Incluido'),
+        ('not_included', 'No incluido'),
+    ], string='Tipo de Impuesto Tienda Nube', default='included', help="Si es 'Incluido' el precio incluye el impuesto, si es 'No incluido' el precio no incluye el impuesto")
     def get_all_products_tn(self):
         url = "https://api.tiendanube.com/v1/%s/products" % self.tiendanube_id
         headers = self.get_headers_tn()
@@ -216,6 +220,8 @@ class TiendaNubeResCompanyInherit(models.Model):
                 price_tn = self.tn_pricelist_id._get_product_price(variant.product_tmpl_id, quantity=1)
                 if price_tn is None:
                     price_tn = variant.list_price
+                if self.tn_type_tax == 'not_included':
+                    price_tn = variant.taxes_id.compute_all(price_tn)['total_included']
                 data = {
                     "promotional_price": variant.precio_promocional_tn,
                     "weight": variant.peso_tn,
@@ -377,6 +383,8 @@ class TiendaNubeResCompanyInherit(models.Model):
             price_tn = self.tn_pricelist_id._get_product_price(variant.product_tmpl_id, quantity=1)
             if price_tn is None:
                 price_tn = variant.list_price
+            if self.tn_type_tax == 'not_included':
+                price_tn = variant.taxes_id.compute_all(price_tn)['total_included']
             variants.append({
                 "values": values,
                 "price": price_tn,
