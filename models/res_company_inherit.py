@@ -18,6 +18,7 @@ class TiendaNubeResCompanyInherit(models.Model):
     ], string='Configuracion de Stock', default='stock', help="Si es 'Stock en mano' se actualiza el stock en base a la cantidad en mano, si es 'Stock pronosticado' se actualiza el stock en base a la cantidad pronosticada")
     tn_config_confirmation_sale = fields.Boolean('Confirmar venta', help="Si esta activo se confirma la venta al crear la orden de venta, sino se deja en estado borrador")
     tn_config_stock_realtime = fields.Boolean('Stock en tiempo real', help="Si esta activo se actualiza el stock en tiempo real, sino se actualiza cada 30 minutos")
+    tn_pricelist_id = fields.Many2one('product.pricelist', string='Lista de Precios Tienda Nube', help="Lista de precios que se usara para los productos de Tienda Nube", required=True)
     def get_all_products_tn(self):
         url = "https://api.tiendanube.com/v1/%s/products" % self.tiendanube_id
         headers = self.get_headers_tn()
@@ -212,6 +213,9 @@ class TiendaNubeResCompanyInherit(models.Model):
                 
                 _logger.info("Headers: %s", headers)
                 _logger.info("URL: %s", url)
+                price_tn = self.tn_pricelist_id._get_product_price(variant.product_tmpl_id, quantity=1)
+                if price_tn is None:
+                    price_tn = variant.list_price
                 data = {
                     "promotional_price": variant.precio_promocional_tn,
                     "weight": variant.peso_tn,
@@ -227,7 +231,7 @@ class TiendaNubeResCompanyInherit(models.Model):
                     "description": variant.product_tmpl_id.description_sale,
                     "published": variant.product_tmpl_id.mostrar_en_tienda_tn,
                     "free_shipping": variant.product_tmpl_id.envio_gratis_tn,
-                    "price": variant.list_price,
+                    "price": price_tn,
                     "stock": variant.qty_available if self.tn_config_stock == 'stock' else variant.virtual_available,
                 }
                 _logger.info("data: %s", data)
@@ -370,9 +374,12 @@ class TiendaNubeResCompanyInherit(models.Model):
             values = []
             for value in variant.product_template_attribute_value_ids:
                 values.append(value.name)
+            price_tn = self.tn_pricelist_id._get_product_price(variant.product_tmpl_id, quantity=1)
+            if price_tn is None:
+                price_tn = variant.list_price
             variants.append({
                 "values": values,
-                "price": variant.list_price,
+                "price": price_tn,
                 "promotional_price": variant.precio_promocional_tn,
                 "weight": variant.peso_tn,
                 "width": variant.ancho_tn,
