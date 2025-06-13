@@ -9,7 +9,7 @@
                         <h3>Sincroniza los almacenes correspondientes</h3>
                         <group>
                             <field name="locations_ids">
-                                <tree string="Almacenes" editable="top">
+                                <tree string="Almacenes" create="0" editable="top">
                                     <field name="location_id" readonly="1"/>
                                     <field name="warehouse_id"/>
                                 </tree>
