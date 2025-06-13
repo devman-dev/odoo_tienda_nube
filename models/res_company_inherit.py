@@ -195,6 +195,10 @@ class TiendaNubeResCompanyInherit(models.Model):
 
     # Metodo de actualizacion desde Odoo a TN
     def update_product_tn(self, products):
+        # Validamos que existan almacenes con location_id_tn
+        wharehouse = self.env['stock.warehouse'].sudo().search([('location_id_tn', '!=', False)])
+        if len(wharehouse) == 0:
+            raise ValidationError('No hay almacenes sincronizados con Tienda Nube, por favor configure al menos un almacén con la ubicación de Tienda Nube')
         headers = self.get_headers_tn()
         for product in products:
             categorias = []
@@ -246,9 +250,24 @@ class TiendaNubeResCompanyInherit(models.Model):
                 _logger.info("Response: %s", response.text)
                 if response.status_code != 200:
                     raise ValidationError('Error al actualizar stock de Tienda Nube: %s' % response.text)
+            # Hacemos un commit y procedemos a actulizar stock por warehouse
+            self.env.cr.commit()
+            # Buscamos los wharehouse que tengan location_id_tn
+            location_id_tn = []
+            for wh in wharehouse:
+                location_id_tn.append(wh.location_id_tn)
+            if not location_id_tn[0]:
+                return
+            # Actualizamos el stock en Tienda Nube
+            self.update_product_stock_tn(product, location_id_tn)
 
     #Actualizamos stock de productos en TN con PATCH /products/stock-price
     def update_product_stock_tn(self, products, location_id_tn):
+        # Validamos que existan almacenes con location_id_tn
+        wharehouse = self.env['stock.warehouse'].sudo().search([('location_id_tn', '!=', False)])
+        if len(wharehouse) == 0:
+            raise ValidationError('No hay almacenes sincronizados con Tienda Nube, por favor configure al menos un almacén con la ubicación de Tienda Nube')
+        
         url = "https://api.tiendanube.com/v1/%s/products/stock-price" % self.tiendanube_id
         headers = self.get_headers_tn()
         _logger.info("Headers: %s", headers)
@@ -348,6 +367,10 @@ class TiendaNubeResCompanyInherit(models.Model):
 
     # Metodo para crear el producto en TN POST /products
     def create_product_tn(self, product):
+        # Validamos que existan almacenes con location_id_tn
+        wharehouse = self.env['stock.warehouse'].sudo().search([('location_id_tn', '!=', False)])
+        if len(wharehouse) == 0:
+            raise ValidationError('No hay almacenes sincronizados con Tienda Nube, por favor configure al menos un almacén con la ubicación de Tienda Nube')
         headers = self.get_headers_tn()
         url = "https://api.tiendanube.com/v1/%s/products" % self.tiendanube_id
 
@@ -441,7 +464,6 @@ class TiendaNubeResCompanyInherit(models.Model):
         self.env.cr.commit()
         # Buscamos los wharehouse que tengan location_id_tn
         location_id_tn = []
-        wharehouse = self.env['stock.warehouse'].sudo().search([('location_id_tn', '!=', False)])
         for wh in wharehouse:
             location_id_tn.append(wh.location_id_tn)
         if not location_id_tn[0]:
