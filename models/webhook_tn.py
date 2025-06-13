@@ -11,6 +11,7 @@ class WebhookTN(models.Model):
     _description = 'Tienda Nube Webhook'
 
     name = fields.Char(string='Name', required=True)
+    company_id = fields.Many2one('res.company', string='Compañía', default=lambda self: self.env.user.company_id, required=True)
     id_webhook_tn = fields.Char(string='ID Tienda Nube')
     url = fields.Char(string='URL', required=True, help='URL del webhook en Tienda Nube')
     event = fields.Selection([
@@ -20,7 +21,7 @@ class WebhookTN(models.Model):
         ('order/created', 'Orden creada'),
         ('order/updated', 'Orden actualizada'),
         ('order/edited', 'Orden editada'),
-        ('order/paid', 'Orden pagada'),
+        ('order/paid', 'Orden paganada'),
         ('order/cancelled', 'Orden cancelada'),
         ('order/fulfilled', 'Orden completada'),
         ('order/packed', 'Orden empaquetada'),
@@ -34,13 +35,17 @@ class WebhookTN(models.Model):
     # Validamos en el wirte y create que la url inicie de forma correcta siendo la url de odoo que figura en paramentros de sistema continuando con /webhook_tn
     @api.model
     def create(self, vals):
-        if vals.get('url') and not vals.get('url').startswith(self.env['ir.config_parameter'].sudo().get_param('web.base.url') + '/webhook_tn'):
+        if vals.get('url') and not vals.get('url').startswith(self.env['ir.config_parameter'].sudo().get_param('web.base.url') + '/webhook_tn/'):
             raise ValidationError('La URL debe iniciar con %s/webhook_tn/' % self.env['ir.config_parameter'].sudo().get_param('web.base.url'))
+        elif vals.get('url') == self.env['ir.config_parameter'].sudo().get_param('web.base.url') + '/webhook_tn/':
+            raise ValidationError('La URL no puede ser la misma que la de Odoo + /webhook_tn/, debe ser de esta manera mas algo por ejemplo: %s/webhook_tn/mi_webhook' % self.env['ir.config_parameter'].sudo().get_param('web.base.url'))
         return super(WebhookTN, self).create(vals)
 
     def write(self, vals):
-        if vals.get('url') and not vals.get('url').startswith(self.env['ir.config_parameter'].sudo().get_param('web.base.url') + '/webhook_tn'):
+        if vals.get('url') and not vals.get('url').startswith(self.env['ir.config_parameter'].sudo().get_param('web.base.url') + '/webhook_tn/'):
             raise ValidationError('La URL debe iniciar con %s/webhook_tn/' % self.env['ir.config_parameter'].sudo().get_param('web.base.url'))
+        elif vals.get('url') == self.env['ir.config_parameter'].sudo().get_param('web.base.url') + '/webhook_tn/':
+            raise ValidationError('La URL no puede ser la misma que la de Odoo + /webhook_tn, debe ser de esta manera mas algo por ejemplo: %s/webhook_tn/mi_webhook' % self.env['ir.config_parameter'].sudo().get_param('web.base.url'))
         return super(WebhookTN, self).write(vals)
 
 
@@ -97,7 +102,7 @@ class WebhookTNReceived(models.Model):
         ('order/created', 'Orden creada'),
         ('order/updated', 'Orden actualizada'),
         ('order/edited', 'Orden editada'),
-        ('order/paid', 'Orden paganada'),
+        ('order/paid', 'Orden pagada'),
         ('order/cancelled', 'Orden cancelada'),
         ('order/fulfilled', 'Orden completada'),
         ('order/packed', 'Orden empaquetada'),

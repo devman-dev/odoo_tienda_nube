@@ -18,6 +18,11 @@ class TiendaNubeResCompanyInherit(models.Model):
     ], string='Configuracion de Stock', default='stock', help="Si es 'Stock en mano' se actualiza el stock en base a la cantidad en mano, si es 'Stock pronosticado' se actualiza el stock en base a la cantidad pronosticada")
     tn_config_confirmation_sale = fields.Boolean('Confirmar venta', help="Si esta activo se confirma la venta al crear la orden de venta, sino se deja en estado borrador")
     tn_config_stock_realtime = fields.Boolean('Stock en tiempo real', help="Si esta activo se actualiza el stock en tiempo real, sino se actualiza cada 30 minutos")
+    tn_pricelist_id = fields.Many2one('product.pricelist', string='Lista de Precios Tienda Nube', help="Lista de precios que se usara para los productos de Tienda Nube", required=True)
+    tn_type_tax = fields.Selection([
+        ('included', 'Incluido'),
+        ('not_included', 'No incluido'),
+    ], string='Tipo de Impuesto Tienda Nube', default='included', help="Si es 'Incluido' el precio incluye el impuesto, si es 'No incluido' el precio no incluye el impuesto")
     def get_all_products_tn(self):
         url = "https://api.tiendanube.com/v1/%s/products" % self.tiendanube_id
         headers = self.get_headers_tn()
@@ -38,6 +43,7 @@ class TiendaNubeResCompanyInherit(models.Model):
         return {
             "Authentication": "bearer " + self.tiendanube_access_token,
             "Content-Type": "application/json",
+            "User-Agent": "Odoo by Devoo"
         }
 
     #Creamos productos de TN en Odoo
@@ -189,6 +195,10 @@ class TiendaNubeResCompanyInherit(models.Model):
 
     # Metodo de actualizacion desde Odoo a TN
     def update_product_tn(self, products):
+        # Validamos que existan almacenes con location_id_tn
+        wharehouse = self.env['stock.warehouse'].sudo().search([('location_id_tn', '!=', False)])
+        if len(wharehouse) == 0:
+            raise ValidationError('No hay almacenes sincronizados con Tienda Nube, por favor configure al menos un almacén con la ubicación de Tienda Nube')
         headers = self.get_headers_tn()
         for product in products:
             categorias = []
@@ -199,6 +209,7 @@ class TiendaNubeResCompanyInherit(models.Model):
                 "categories" : categorias,
                 "published": product.mostrar_en_tienda_tn,
                 "free_shipping": product.envio_gratis_tn,
+                "description": product.description_sale,
                 "name": product.name,
             }
             _logger.info("data: %s", data)
@@ -210,6 +221,11 @@ class TiendaNubeResCompanyInherit(models.Model):
                 
                 _logger.info("Headers: %s", headers)
                 _logger.info("URL: %s", url)
+                price_tn = self.tn_pricelist_id._get_product_price(variant.product_tmpl_id, quantity=1)
+                if price_tn is None:
+                    price_tn = variant.list_price
+                if self.tn_type_tax == 'not_included':
+                    price_tn = variant.taxes_id.compute_all(price_tn)['total_included']
                 data = {
                     "promotional_price": variant.precio_promocional_tn,
                     "weight": variant.peso_tn,
@@ -225,7 +241,7 @@ class TiendaNubeResCompanyInherit(models.Model):
                     "description": variant.product_tmpl_id.description_sale,
                     "published": variant.product_tmpl_id.mostrar_en_tienda_tn,
                     "free_shipping": variant.product_tmpl_id.envio_gratis_tn,
-                    "price": variant.list_price,
+                    "price": price_tn,
                     "stock": variant.qty_available if self.tn_config_stock == 'stock' else variant.virtual_available,
                 }
                 _logger.info("data: %s", data)
@@ -234,9 +250,24 @@ class TiendaNubeResCompanyInherit(models.Model):
                 _logger.info("Response: %s", response.text)
                 if response.status_code != 200:
                     raise ValidationError('Error al actualizar stock de Tienda Nube: %s' % response.text)
+            # Hacemos un commit y procedemos a actulizar stock por warehouse
+            self.env.cr.commit()
+            # Buscamos los wharehouse que tengan location_id_tn
+            location_id_tn = []
+            for wh in wharehouse:
+                location_id_tn.append(wh.location_id_tn)
+            if not location_id_tn[0]:
+                return
+            # Actualizamos el stock en Tienda Nube
+            self.update_product_stock_tn(product, location_id_tn)
 
     #Actualizamos stock de productos en TN con PATCH /products/stock-price
     def update_product_stock_tn(self, products, location_id_tn):
+        # Validamos que existan almacenes con location_id_tn
+        wharehouse = self.env['stock.warehouse'].sudo().search([('location_id_tn', '!=', False)])
+        if len(wharehouse) == 0:
+            raise ValidationError('No hay almacenes sincronizados con Tienda Nube, por favor configure al menos un almacén con la ubicación de Tienda Nube')
+        
         url = "https://api.tiendanube.com/v1/%s/products/stock-price" % self.tiendanube_id
         headers = self.get_headers_tn()
         _logger.info("Headers: %s", headers)
@@ -336,17 +367,25 @@ class TiendaNubeResCompanyInherit(models.Model):
 
     # Metodo para crear el producto en TN POST /products
     def create_product_tn(self, product):
+        # Validamos que existan almacenes con location_id_tn
+        wharehouse = self.env['stock.warehouse'].sudo().search([('location_id_tn', '!=', False)])
+        if len(wharehouse) == 0:
+            raise ValidationError('No hay almacenes sincronizados con Tienda Nube, por favor configure al menos un almacén con la ubicación de Tienda Nube')
         headers = self.get_headers_tn()
         url = "https://api.tiendanube.com/v1/%s/products" % self.tiendanube_id
 
         # Obtenemos url de Odoo desde los parametros de sistema
         url_odoo = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
         images = []
+        cant_images = 1 # Contador de imagenes, como maximo se pueden subir 9 imagenes a TN
         for variant in product.product_variant_ids:
             if variant.image_1920:
                 images.append({
                     "src": url_odoo + '/ati_tn_product_template_ids/' + str(variant.id),
                 })
+            cant_images += 1
+            if cant_images == 9:
+                break
 
         categorias = []
         for category in product.categoria_tn_ids:
@@ -364,9 +403,14 @@ class TiendaNubeResCompanyInherit(models.Model):
             values = []
             for value in variant.product_template_attribute_value_ids:
                 values.append(value.name)
+            price_tn = self.tn_pricelist_id._get_product_price(variant.product_tmpl_id, quantity=1)
+            if price_tn is None:
+                price_tn = variant.list_price
+            if self.tn_type_tax == 'not_included':
+                price_tn = variant.taxes_id.compute_all(price_tn)['total_included']
             variants.append({
                 "values": values,
-                "price": variant.list_price,
+                "price": price_tn,
                 "promotional_price": variant.precio_promocional_tn,
                 "weight": variant.peso_tn,
                 "width": variant.ancho_tn,
@@ -399,11 +443,34 @@ class TiendaNubeResCompanyInherit(models.Model):
             data = response.json()
             product.id_tn = data['id']
             #asignamos el id de Tienda Nube a cada variante
+            # Variable position para utilizar como bandera e identificar la posicion de las imagenes en el arreglo image devuelto
+            position = 0
             for v in data['variants']:
                 variant = product.product_variant_ids.filtered(lambda x: x.barcode.replace(' ', '') == v['barcode'])
                 variant.product_id_tn = v['id']
+                if 'images' in data and len(data['images']) > 0:
+                    #Modificamos la imagenes de la variante en tienda nube
+                    url_put_image = "https://api.tiendanube.com/v1/%s/products/%s/variants/%s" % (self.tiendanube_id, v['product_id'], v['id'])
+                    data_variant_image = {
+                        "image_id": data['images'][position]['id'],
+                    }
+                    response_image_variant = requests.put(url_put_image, headers=headers, json=data_variant_image)
+                    _logger.info("Response: %s", response_image_variant.text)
+                position += 1
+
         else:
             raise ValidationError('Error al crear producto en Tienda Nube: %s' % response.text)
+        # Hacemos un commit y procedemos a actulizar stock por warehouse
+        self.env.cr.commit()
+        # Buscamos los wharehouse que tengan location_id_tn
+        location_id_tn = []
+        for wh in wharehouse:
+            location_id_tn.append(wh.location_id_tn)
+        if not location_id_tn[0]:
+            return
+        # Actualizamos el stock en Tienda Nube
+        self.update_product_stock_tn(product, location_id_tn)
+
 
     # Metodo para obtener webooks de Tienda Nube
     def get_webhooks_tn(self):

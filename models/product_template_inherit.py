@@ -16,13 +16,11 @@ class TiendaNubeProductTemplateInherit(models.Model):
 
     #Campos de variables
     precio_promocional_tn = fields.Float('Precio Promocional Tienda Nube', help="Precio promocional de Tienda Nube", compute='_compute_precio_promocional_tn', inverse='_set_precio_promocional_tn')
-
     #Dimensiones TN
     alto_tn = fields.Float('Alto en CM', help="Alto en Tienda Nube", compute='_compute_alto_tn', inverse='_set_alto_tn')
     ancho_tn = fields.Float('Ancho en CM', help="Ancho en Tienda Nube", compute='_compute_ancho_tn', inverse='_set_ancho_tn')
     profundidad_tn = fields.Float('Profundidad en CM', help="Profundidad en Tienda Nube", compute='_compute_profundidad_tn', inverse='_set_profundidad_tn')
     peso_tn = fields.Float('Peso en Kg', help="Peso en Tienda Nube", compute='_compute_peso_tn', inverse='_set_peso_tn')
-
     #Instagram y Google Shopping
     mpn_tn = fields.Char('MPN', help="MPN (Número de pieza del fabricante) en Tienda Nube", compute='_compute_mpn_tn', inverse='_set_mpn_tn')
     rango_edad_tn = fields.Selection([
@@ -37,7 +35,6 @@ class TiendaNubeProductTemplateInherit(models.Model):
         ('male', 'Masculino'),
         ('female', 'Femenino'),
     ], string='Sexo', help="Sexo en Tienda Nube", default='unisex', compute='_compute_sexo_tn', inverse='_set_sexo_tn')
-
     # precio_promocional_tn
     @api.depends('product_variant_ids.precio_promocional_tn')
     def _compute_precio_promocional_tn(self):
@@ -58,7 +55,6 @@ class TiendaNubeProductTemplateInherit(models.Model):
             archived_variants = self.with_context(active_test=False).product_variant_ids
             if len(archived_variants) == 1:
                 archived_variants.precio_promocional_tn = self.precio_promocional_tn
-
     # sexo_tn
     @api.depends('product_variant_ids.sexo_tn')
     def _compute_sexo_tn(self):
@@ -79,7 +75,6 @@ class TiendaNubeProductTemplateInherit(models.Model):
             archived_variants = self.with_context(active_test=False).product_variant_ids
             if len(archived_variants) == 1:
                 archived_variants.sexo_tn = self.sexo_tn
-
     # rango_edad_tn
     @api.depends('product_variant_ids.rango_edad_tn')
     def _compute_rango_edad_tn(self):
@@ -100,7 +95,6 @@ class TiendaNubeProductTemplateInherit(models.Model):
             archived_variants = self.with_context(active_test=False).product_variant_ids
             if len(archived_variants) == 1:
                 archived_variants.rango_edad_tn = self.rango_edad_tn
-
     # mpn_tn
     @api.depends('product_variant_ids.mpn_tn')
     def _compute_mpn_tn(self):
@@ -121,7 +115,6 @@ class TiendaNubeProductTemplateInherit(models.Model):
             archived_variants = self.with_context(active_test=False).product_variant_ids
             if len(archived_variants) == 1:
                 archived_variants.mpn_tn = self.mpn_tn
-
     # alto_tn
     @api.depends('product_variant_ids.alto_tn')
     def _compute_alto_tn(self):
@@ -142,7 +135,6 @@ class TiendaNubeProductTemplateInherit(models.Model):
             archived_variants = self.with_context(active_test=False).product_variant_ids
             if len(archived_variants) == 1:
                 archived_variants.alto_tn = self.alto_tn
-
     #ancho_tn
     @api.depends('product_variant_ids.ancho_tn')
     def _compute_ancho_tn(self):
@@ -163,7 +155,6 @@ class TiendaNubeProductTemplateInherit(models.Model):
             archived_variants = self.with_context(active_test=False).product_variant_ids
             if len(archived_variants) == 1:
                 archived_variants.ancho_tn = self.ancho_tn
-
     #profundidad_tn
     @api.depends('product_variant_ids.profundidad_tn')
     def _compute_profundidad_tn(self):
@@ -184,7 +175,6 @@ class TiendaNubeProductTemplateInherit(models.Model):
             archived_variants = self.with_context(active_test=False).product_variant_ids
             if len(archived_variants) == 1:
                 archived_variants.profundidad_tn = self.profundidad_tn
-
     #peso_tn
     @api.depends('product_variant_ids.peso_tn')
     def _compute_peso_tn(self):
@@ -239,6 +229,18 @@ class TiendaNubeProductTemplateInherit(models.Model):
         for product in self:
             if not product.id_tn:
                 self.env.user.company_id.create_product_tn(product)
+
+    # Metodo para desvincular producto de Tienda Nube
+    def unlink_tn(self):
+        for product in self:
+            for v in product.product_variant_ids:
+                v.write({
+                    'product_id_tn': False,
+                })
+
+            product.write({
+                'id_tn': False,
+            })
 
     # Metodo para crear/actualizar producto en Odoo desde TN por medio de id GET /products/{id}
     def create_update_product_from_tn(self):
