@@ -24,7 +24,7 @@
         <field name="arch" type="xml">
             <form string="Tn Log">
                 <header>
-                    <button name="mark_as_solved" string="Marcar como Solucionado" type="object" class="oe_highlight" attrs="{'invisible': [('level', '=', 'success')]}"/>
+                    <button name="mark_as_solved" string="Marcar como Solucionado" type="object" class="oe_highlight" invisible="level == 'success'"/>
                 </header>
                 <sheet>
                     <div class="oe_title">
