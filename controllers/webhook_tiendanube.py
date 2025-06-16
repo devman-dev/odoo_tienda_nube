@@ -73,8 +73,8 @@ class TiendaNubeWebHook(http.Controller):
                     ],limit=1)
                 exitoso = False
 
-                # Id de empresa para pasar la empresa en el contexto de creaciones
-                company_id = webhook.company_id.id if webhook.company_id else None
+                # Recordset de empresa para pasar la empresa en el contexto de creaciones
+                company_id = webhook.company_id if webhook.company_id else None
                 if webhook:
                     #CATEGORIAS
                     #category/updated
@@ -121,7 +121,7 @@ class TiendaNubeWebHook(http.Controller):
                                 ('id_tn','=',data['id'])
                                 ],limit=1)
                             if not product:
-                                product = request.env['product.template'].with_context(force_company=company_id).sudo().create({
+                                product = request.env['product.template'].with_company(company_id).sudo().create({
                                     'id_tn': data['id'],
                                     'name': 'Nuevo Producto TN id: ' + str(data['id']),
                                 })
@@ -161,7 +161,7 @@ class TiendaNubeWebHook(http.Controller):
                             ],limit=1)
                         if not order:
                             #Asignamos de forma temporal como cliente a la empresa para poder crear la orden
-                            order = request.env['sale.order'].with_context(force_company=company_id).sudo().create({
+                            order = request.env['sale.order'].with_company(company_id).sudo().create({
                                 'id_tn': data['id'],
                                 'partner_id': request.env.company.sudo().partner_id.id,
                                 'name': 'Orden TN id: ' + str(data['id']),
@@ -177,7 +177,7 @@ class TiendaNubeWebHook(http.Controller):
                             ],limit=1)
                         if not order:
                             #Asignamos de forma temporal como cliente a la empresa para poder crear la orden
-                            order = request.env['sale.order'].with_context(force_company=company_id).sudo().create({
+                            order = request.env['sale.order'].with_company(company_id).sudo().create({
                                 'id_tn': data['id'],
                                 'partner_id': request.env.company.sudo().partner_id.id,
                                 'name': 'Orden TN id: ' + str(data['id']),
