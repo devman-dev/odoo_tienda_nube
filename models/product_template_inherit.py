@@ -202,7 +202,7 @@ class TiendaNubeProductTemplateInherit(models.Model):
         for product in self:
             if product.id == product_discount_tn.id:
                 raise ValidationError(_("No se puede borrar el producto de descuento de Tienda Nube"))
-        return super(TiendaNubeProductProductInherit, self).unlink()
+        return super(TiendaNubeProductTemplateInherit, self).unlink()
 
     # Metodo de actualizacion desde Odoo a TN
     def update_tn(self):
