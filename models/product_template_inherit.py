@@ -208,12 +208,16 @@ class TiendaNubeProductTemplateInherit(models.Model):
     def update_tn(self):
         for product in self:
             if product.id_tn:
-                self.env.user.company_id.update_product_tn(product)
+                # NOTE: Utilizamos la compañia que tiene seleccionada el usuario actual o en caso contrario la compañia predeterminada de ese usuario
+                company = self.env.company if self.env.company else self.env.user.company_id
+                company.update_product_tn(product)
 
     # Metodo de actualizacion de stock desde Odoo a TN
     def update_stock_tn(self):
         for product in self:
             if product.id_tn:
+                # NOTE: Utilizamos la compañia que tiene seleccionada el usuario actual o en caso contrario la compañia predeterminada de ese usuario
+                company = self.env.company if self.env.company else self.env.user.company_id
                 #Obtenemos los almacenes de la compañia que tenga location_id_tn
                 warehouses = self.env['stock.warehouse'].search([('location_id_tn', '!=', False)])
                 location_id_tn = []
@@ -222,13 +226,15 @@ class TiendaNubeProductTemplateInherit(models.Model):
                 if len(location_id_tn) == 0:
                     return
 
-                self.env.user.company_id.update_product_stock_tn(product, location_id_tn)
+                company.update_product_stock_tn(product, location_id_tn)
 
     # Metodo para crear el producto en TN
     def create_tn(self):
         for product in self:
             if not product.id_tn:
-                self.env.user.company_id.create_product_tn(product)
+                # NOTE: Utilizamos la compañia que tiene seleccionada el usuario actual o en caso contrario la compañia predeterminada de ese usuario
+                company = self.env.company if self.env.company else self.env.user.company_id
+                company.create_product_tn(product)
 
     # Metodo para desvincular producto de Tienda Nube
     def unlink_tn(self):
@@ -245,7 +251,8 @@ class TiendaNubeProductTemplateInherit(models.Model):
     # Metodo para crear/actualizar producto en Odoo desde TN por medio de id GET /products/{id}
     def create_update_product_from_tn(self):
 
-        company = self.env.user.company_id
+        # NOTE: Utilizamos la compañia que tiene seleccionada el usuario actual o en caso contrario la compañia predeterminada de ese usuario
+        company = self.env.company if self.env.company else self.env.user.company_id
         # Primero creamos todas las categorias en Odoo por si tenemos alguna faltante
         company.get_all_categories_tn()
 
