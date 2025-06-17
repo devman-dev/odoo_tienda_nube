@@ -170,7 +170,7 @@ class SaleOrderTiendaNubeInherit(models.Model):
 
                 # DESCUENTOS
                 if len(order['coupon']) or len(order['promotional_discount']['promotions_applied']):
-                    product_discount_tn = self.env.ref('tiendanube_odoo.product_discount_tn')
+                    product_discount_tn = self.env.ref('odoo_tienda_nube.product_discount_tn')
                     if not product_discount_tn:
                         raise ValidationError(_("Producto de descuento no encontrado en Odoo"))
                     # Agregamos seccion de descuento en Sale Order
