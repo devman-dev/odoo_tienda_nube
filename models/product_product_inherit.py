@@ -33,7 +33,7 @@ class TiendaNubeProductProductInherit(models.Model):
 
     # Sobreescribimos unlink para que no se pueda borrar producto de descuento de Tienda Nube
     def unlink(self):
-        product_discount_tn = self.env.ref('tiendanube_odoo.product_discount_tn')
+        product_discount_tn = self.env.ref('odoo_tienda_nube.product_discount_tn')
         for product in self:
             if product.id == product_discount_tn.id:
                 raise ValidationError(_("No se puede borrar el producto de descuento de Tienda Nube"))
