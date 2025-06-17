@@ -7,7 +7,7 @@ from odoo.tools import base64
 import odoo
 import json
 from odoo import http
-from odoo.http import request
+from odoo.http import request, Response
 
 _logger = logging.getLogger(__name__)
 CORS = '*'
@@ -25,7 +25,7 @@ class TiendaNubeWebHook(http.Controller):
         return False
 
     #Controller para descargar adjuntos
-    @http.route('/webhook_tn/<string:code_event>', auth='public', cors=CORS, csrf=False)
+    @http.route('/webhook_tn/<string:code_event>', auth='public', cors=CORS, csrf=False, type='json')
     def TiendaNubeWebHook(self, **kw):
 
         
@@ -33,7 +33,7 @@ class TiendaNubeWebHook(http.Controller):
         lock_name = 'webhook_processing'
         if request.env['ir.config_parameter'].sudo().get_param(lock_name) == 'En uso':
             _logger.info('******* lock_name encontrado y rebotado')
-            return request.make_response(
+            return Response(
                 json.dumps({"mensaje": "Otra solicitud está en proceso"}),
                 headers={'Content-Type': 'application/json'},
                 status=429
@@ -50,7 +50,7 @@ class TiendaNubeWebHook(http.Controller):
 
             # Verificacion de duplicidad
             if self.duplicity_check(data):
-                return request.make_response(
+                return Response(
                     json.dumps({"mensaje": "Operación duplicada"}),
                     headers={'Content-Type': 'application/json'},
                     status=200
@@ -129,7 +129,7 @@ class TiendaNubeWebHook(http.Controller):
                             exitoso = True
                         except Exception as e:
                             _logger.info('*********** Error: %s' % e)
-                            return request.make_response(
+                            return Response(
                                 json.dumps({"mensaje": "Error al crear el producto"}),
                                 headers={'Content-Type': 'application/json'},
                                 status=500
@@ -146,7 +146,7 @@ class TiendaNubeWebHook(http.Controller):
                                 product.sudo().create_update_product_from_tn()
                             except Exception as e:
                                 _logger.info('*********** Error: %s' % e)
-                                return request.make_response(
+                                return Response(
                                     json.dumps({"mensaje": "Error al actualizar el producto"}),
                                     headers={'Content-Type': 'application/json'},
                                     status=500
@@ -186,13 +186,13 @@ class TiendaNubeWebHook(http.Controller):
                         exitoso = True
 
                 if exitoso:
-                    return request.make_response(
+                    return Response(
                         json.dumps({"mensaje": "Operación exitosa"}),
                         headers={'Content-Type': 'application/json'},
                         status=200
                     )
                 else:
-                    return request.make_response(
+                    return Response(
                         json.dumps({"mensaje": "Operación no encontrada"}),
                         headers={'Content-Type': 'application/json'},
                         status=404
@@ -200,7 +200,7 @@ class TiendaNubeWebHook(http.Controller):
         except Exception as e:
             _logger.info('*********** Error: %s' % e)
             request.env['ir.config_parameter'].sudo().set_param(lock_name, 'Disponible')
-            return request.make_response(
+            return Response(
                 json.dumps({"mensaje": "Error al procesar la solicitud"}),
                 headers={'Content-Type': 'application/json'},
                 status=500
