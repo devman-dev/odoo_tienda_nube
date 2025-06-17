@@ -14,7 +14,7 @@ class CategoryTn(models.Model):
     # Metodo crear o actualizar en Tienda Nube POST /categories
     def create_or_update_tn(self):
         for rec in self:
-            company = rec.env.user.company_id
+            company = rec.env.company if rec.env.company else rec.env.user.company_id
             url = "https://api.tiendanube.com/v1/%s/categories" % company.tiendanube_id
             headers = company.get_headers_tn()
             _logger.info("Headers: %s", headers)
@@ -45,7 +45,7 @@ class CategoryTn(models.Model):
         for rec in self:
             if not rec.tn_id:
                 raise UserError("No se puede actualizar una categoria sin ID de Tienda Nube")
-            company = rec.env.user.company_id
+            company = rec.env.company if rec.env.company else rec.env.user.company_id
             url = "https://api.tiendanube.com/v1/%s/categories/%s" % (company.tiendanube_id, rec.tn_id)
             headers = company.get_headers_tn()
             response = requests.get(url, headers=headers)
