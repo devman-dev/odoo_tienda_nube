@@ -221,7 +221,7 @@ class TiendaNubeResCompanyInherit(models.Model):
                 
                 _logger.info("Headers: %s", headers)
                 _logger.info("URL: %s", url)
-                price_tn = self.tn_pricelist_id._get_product_price(variant.product_tmpl_id, quantity=1)
+                price_tn = self.tn_pricelist_id.get_product_price(variant.product_tmpl_id, quantity=1, partner=self.env.ref('base.partner_root'))
                 if price_tn is None:
                     price_tn = variant.list_price
                 if self.tn_type_tax == 'not_included':
@@ -403,7 +403,7 @@ class TiendaNubeResCompanyInherit(models.Model):
             values = []
             for value in variant.product_template_attribute_value_ids:
                 values.append(value.name)
-            price_tn = self.tn_pricelist_id._get_product_price(variant.product_tmpl_id, quantity=1)
+            price_tn = self.tn_pricelist_id.get_product_price(variant.product_tmpl_id, quantity=1, partner=self.env.ref('base.partner_root'))
             if price_tn is None:
                 price_tn = variant.list_price
             if self.tn_type_tax == 'not_included':
