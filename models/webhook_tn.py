@@ -11,7 +11,7 @@ class WebhookTN(models.Model):
     _description = 'Tienda Nube Webhook'
 
     name = fields.Char(string='Name', required=True)
-    company_id = fields.Many2one('res.company', string='Compañía', default=lambda self: self.env.user.company_id, required=True)
+    company_id = fields.Many2one('res.company', string='Compañía', default=lambda self: self.env.company if self.env.company else self.env.user.company_id, required=True)
     id_webhook_tn = fields.Char(string='ID Tienda Nube')
     url = fields.Char(string='URL', required=True, help='URL del webhook en Tienda Nube')
     event = fields.Selection([
@@ -51,7 +51,8 @@ class WebhookTN(models.Model):
 
     # Metodo para eliminar el webhook en Tienda Nube DELETE /webhooks/{id}
     def delete_webhook_tn(self):
-        company = self.env.user.company_id
+        # NOTE: Utilizamos la compañia que tiene seleccionada el usuario actual o en caso contrario la compañia predeterminada de ese usuario
+        company = self.env.company if self.env.company else self.env.user.company_id
         url = "https://api.tiendanube.com/v1/%s/webhooks/%s" % (company.tiendanube_id, self.id_webhook_tn)
         headers = company.get_headers_tn()
         response = requests.delete(url, headers=headers)
@@ -62,7 +63,8 @@ class WebhookTN(models.Model):
 
     # Metodo para crear o editar el webhook en Tienda Nube POST /webhooks y PUT /webhooks/{id}
     def create_or_update_webhook_tn(self):
-        company = self.env.user.company_id
+        # NOTE: Utilizamos la compañia que tiene seleccionada el usuario actual o en caso contrario la compañia predeterminada de ese usuario
+        company = self.env.company if self.env.company else self.env.user.company_id
         url = "https://api.tiendanube.com/v1/%s/webhooks" % company.tiendanube_id
         headers = company.get_headers_tn()
         payload = {
