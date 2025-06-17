@@ -5,5 +5,6 @@ class CreateAllOrdersWizard(models.TransientModel):
     _description = 'Wizard to create all orders'
     
     def create_all_orders(self):
-        company = self.env.user.company_id
+        # NOTE: Utilizamos la compañia que tiene seleccionada el usuario actual o en caso contrario la compañia predeterminada de ese usuario
+        company = self.env.company if self.env.company else self.env.user.company_id
         company.get_all_orders_tn()

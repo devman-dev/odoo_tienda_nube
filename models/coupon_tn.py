@@ -55,7 +55,8 @@ class CouponTn(models.Model):
 
     # Editamos cupon en TN PUT /coupons
     def write_coupon_tn(self):
-        company = self.env.user.company_id
+        # NOTE: Utilizamos la compañia que tiene seleccionada el usuario actual o en caso contrario la compañia predeterminada de ese usuario
+        company = self.env.company if self.env.company else self.env.user.company_id
         url = "https://api.tiendanube.com/v1/%s/coupons/%s" % (company.tiendanube_id, self.id_tn)
         headers = company.get_headers_tn()
         category = []
@@ -111,7 +112,8 @@ class CouponTn(models.Model):
     
     # Creamos cupon en TN POST /coupons
     def create_coupon_tn(self):
-        company = self.env.user.company_id
+        # NOTE: Utilizamos la compañia que tiene seleccionada el usuario actual o en caso contrario la compañia predeterminada de ese usuario
+        company = self.env.company if self.env.company else self.env.user.company_id
         url = "https://api.tiendanube.com/v1/%s/coupons" % company.tiendanube_id
         headers = company.get_headers_tn()
         category = []
