@@ -251,8 +251,11 @@ class TiendaNubeProductTemplateInherit(models.Model):
     # Metodo para crear/actualizar producto en Odoo desde TN por medio de id GET /products/{id}
     def create_update_product_from_tn(self):
 
-        # NOTE: Utilizamos la compañia que tiene seleccionada el usuario actual o en caso contrario la compañia predeterminada de ese usuario
-        company = self.env.company if self.env.company else self.env.user.company_id
+        if self.env.context.get('company_id'):
+            company = self.env['res.company'].browse(self.env.context.get('company_id'))
+        else:
+            # NOTE: Utilizamos la compañia que tiene seleccionada el usuario actual o en caso contrario la compañia predeterminada de ese usuario
+            company = self.env.company if self.env.company else self.env.user.company_id
         # Primero creamos todas las categorias en Odoo por si tenemos alguna faltante
         company.get_all_categories_tn()
 

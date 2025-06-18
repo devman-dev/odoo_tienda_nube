@@ -64,8 +64,11 @@ class SaleOrderTiendaNubeInherit(models.Model):
             raise ValidationError(_("La orden de venta debe estar en estado Borrador para poder ser editada por Tienda Nube"))
         try:
             _logger.info("Create Order from TN")
-            # NOTE: Utilizamos la compañia que tiene seleccionada el usuario actual o en caso contrario la compañia predeterminada de ese usuario
-            company = self.env.company if self.env.company else self.env.user.company_id
+            if self.env.context.get('company_id'):
+                company = self.env['res.company'].browse(self.env.context.get('company_id'))
+            else:
+                # NOTE: Utilizamos la compañia que tiene seleccionada el usuario actual o en caso contrario la compañia predeterminada de ese usuario
+                company = self.env.company if self.env.company else self.env.user.company_id
             headers = company.get_headers_tn()
             url = "https://api.tiendanube.com/v1/%s/orders/%s?aggregates=fulfillment_orders" % (company.tiendanube_id, self.id_tn)
             response = requests.get(url, headers=headers)

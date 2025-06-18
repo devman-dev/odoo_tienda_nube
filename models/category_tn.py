@@ -45,7 +45,10 @@ class CategoryTn(models.Model):
         for rec in self:
             if not rec.tn_id:
                 raise UserError("No se puede actualizar una categoria sin ID de Tienda Nube")
-            company = rec.env.company if rec.env.company else rec.env.user.company_id
+            if self.env.context.get('company_id'):
+                company = self.env['res.company'].browse(self.env.context.get('company_id'))
+            else:
+                company = rec.env.company if rec.env.company else rec.env.user.company_id
             url = "https://api.tiendanube.com/v1/%s/categories/%s" % (company.tiendanube_id, rec.tn_id)
             headers = company.get_headers_tn()
             response = requests.get(url, headers=headers)
