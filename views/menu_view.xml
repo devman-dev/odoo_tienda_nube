@@ -96,7 +96,7 @@
     </record>
     
     <!-- Menu y Menus principales -->
-    <menuitem id="menu_tn" name="Tienda Nube" web_icon="tiendanube_odoo,static/description/icon.png"/>
+    <menuitem id="menu_tn" name="Tienda Nube" web_icon="odoo_tienda_nube,static/description/icon.png"/>
     <menuitem id="menu_products_tn" name="Productos" parent="menu_tn" sequence="1" action="action_open_products_tn"/>
     <menuitem id="menu_category_tn" name="Categorias" parent="menu_tn" sequence="2" action="action_open_category_tn"/>
     <!-- Configuraciones -->
