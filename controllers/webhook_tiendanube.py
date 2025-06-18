@@ -83,7 +83,7 @@ class TiendaNubeWebHook(http.Controller):
                             ('tn_id','=',data['id'])
                             ],limit=1)
                         if category:
-                            category.sudo().update_category_tn_odoo()
+                            category.sudo().with_company(company_id).update_category_tn_odoo()
                         exitoso = True
                         
                     #category/created
@@ -125,7 +125,7 @@ class TiendaNubeWebHook(http.Controller):
                                     'id_tn': data['id'],
                                     'name': 'Nuevo Producto TN id: ' + str(data['id']),
                                 })
-                            product.sudo().create_update_product_from_tn()
+                            product.sudo().with_company(company_id).create_update_product_from_tn()
                             exitoso = True
                         except Exception as e:
                             _logger.info('*********** Error: %s' % e)
@@ -143,7 +143,7 @@ class TiendaNubeWebHook(http.Controller):
                         # con un tiempo de 2 min suponiendo que mas que esto no demorarian los webhooks
                         if product and (odoo.fields.Datetime.now() - product.write_date).seconds > 120:
                             try:
-                                product.sudo().create_update_product_from_tn()
+                                product.sudo().with_company(company_id).create_update_product_from_tn()
                             except Exception as e:
                                 _logger.info('*********** Error: %s' % e)
                                 return Response(
@@ -166,7 +166,7 @@ class TiendaNubeWebHook(http.Controller):
                                 'partner_id': request.env.company.sudo().partner_id.id,
                                 'name': 'Orden TN id: ' + str(data['id']),
                             })
-                            order.sudo().create_order_from_tn()
+                            order.sudo().with_company(company_id).create_order_from_tn()
                         exitoso = True
 
                     #order/paid
@@ -182,7 +182,7 @@ class TiendaNubeWebHook(http.Controller):
                                 'partner_id': request.env.company.sudo().partner_id.id,
                                 'name': 'Orden TN id: ' + str(data['id']),
                             })
-                            order.sudo().create_order_from_tn()
+                            order.sudo().with_company(company_id).create_order_from_tn()
                         exitoso = True
 
                 if exitoso:
