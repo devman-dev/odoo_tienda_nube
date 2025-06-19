@@ -8,6 +8,7 @@
 
                 <xpath expr="//field[@name='barcode']" position="after">
                     <field name="product_id_tn" readonly="1"/>
+                    <field name="stock_ilimitado_tn" />
                     <field name="precio_promocional_tn" />
                     <field name="alto_tn" />
                     <field name="ancho_tn" />
