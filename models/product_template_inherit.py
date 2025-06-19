@@ -15,6 +15,7 @@ class TiendaNubeProductTemplateInherit(models.Model):
     categoria_tn_ids = fields.Many2many('category.tn', string='Categorias Tienda Nube', help="Categorias de Tienda Nube")
 
     #Campos de variables
+    stock_ilimitado_tn = fields.Boolean('Stock Ilimitado en Tienda Nube', help="Stock Ilimitado en Tienda Nube", compute='_compute_stock_ilimitado_tn', inverse='_set_stock_ilimitado_tn')
     precio_promocional_tn = fields.Float('Precio Promocional Tienda Nube', help="Precio promocional de Tienda Nube", compute='_compute_precio_promocional_tn', inverse='_set_precio_promocional_tn')
     #Dimensiones TN
     alto_tn = fields.Float('Alto en CM', help="Alto en Tienda Nube", compute='_compute_alto_tn', inverse='_set_alto_tn')
@@ -35,6 +36,26 @@ class TiendaNubeProductTemplateInherit(models.Model):
         ('male', 'Masculino'),
         ('female', 'Femenino'),
     ], string='Sexo', help="Sexo en Tienda Nube", default='unisex', compute='_compute_sexo_tn', inverse='_set_sexo_tn')
+    # stock_ilimitado_tn
+    @api.depends('product_variant_ids.stock_ilimitado_tn')
+    def _compute_stock_ilimitado_tn(self):
+        self.stock_ilimitado_tn = False
+        for template in self:
+            variant_count = len(template.product_variant_ids)
+            if variant_count == 1:
+                template.stock_ilimitado_tn = template.product_variant_ids.stock_ilimitado_tn
+            elif variant_count == 0:
+                archived_variants = template.with_context(active_test=False).product_variant_ids
+                if len(archived_variants) == 1:
+                    template.stock_ilimitado_tn = archived_variants.stock_ilimitado_tn
+    def _set_stock_ilimitado_tn(self):
+        variant_count = len(self.product_variant_ids)
+        if variant_count == 1:
+            self.product_variant_ids.stock_ilimitado_tn = self.stock_ilimitado_tn
+        elif variant_count == 0:
+            archived_variants = self.with_context(active_test=False).product_variant_ids
+            if len(archived_variants) == 1:
+                archived_variants.stock_ilimitado_tn = self.stock_ilimitado_tn
     # precio_promocional_tn
     @api.depends('product_variant_ids.precio_promocional_tn')
     def _compute_precio_promocional_tn(self):
