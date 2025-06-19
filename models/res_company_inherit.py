@@ -226,6 +226,9 @@ class TiendaNubeResCompanyInherit(models.Model):
                     price_tn = variant.list_price
                 if self.tn_type_tax == 'not_included':
                     price_tn = variant.taxes_id.compute_all(price_tn)['total_included']
+                stock_variant = variant.qty_available if self.tn_config_stock == 'stock' else variant.virtual_available
+                if stock_variant < 0:
+                    stock_variant = 0
                 data = {
                     "promotional_price": variant.precio_promocional_tn,
                     "weight": variant.peso_tn,
@@ -242,7 +245,7 @@ class TiendaNubeResCompanyInherit(models.Model):
                     "published": variant.product_tmpl_id.mostrar_en_tienda_tn,
                     "free_shipping": variant.product_tmpl_id.envio_gratis_tn,
                     "price": price_tn,
-                    "stock": variant.qty_available if self.tn_config_stock == 'stock' else variant.virtual_available,
+                    "stock": stock_variant,
                 }
                 _logger.info("data: %s", data)
                 response = requests.put(url, headers=headers, json=data)
@@ -285,11 +288,17 @@ class TiendaNubeResCompanyInherit(models.Model):
                     warehouse = self.env['stock.warehouse'].search([('location_id_tn', '=', location)])
                     if warehouse:
                         variant = variant.with_context(warehouse=warehouse.ids)
+                    if not variant.stock_ilimitado_tn:
+                        stock_variant = int(variant.qty_available) if self.tn_config_stock == 'stock' else int(variant.virtual_available)
+                        if stock_variant < 0:
+                            stock_variant = 0
+                    else:
+                        stock_variant = ""
                     data_variants.append({
                         'id': int(variant.product_id_tn),
                         "inventory_levels": [{
                             "location_id": location,
-                            "stock": int(variant.qty_available) if self.tn_config_stock == 'stock' else int(variant.virtual_available),
+                            "stock": stock_variant,
                         }]
                     })
             
@@ -408,6 +417,9 @@ class TiendaNubeResCompanyInherit(models.Model):
                 price_tn = variant.list_price
             if self.tn_type_tax == 'not_included':
                 price_tn = variant.taxes_id.compute_all(price_tn)['total_included']
+            stock_variant = variant.qty_available if self.tn_config_stock == 'stock' else variant.virtual_available
+            if stock_variant < 0:
+                stock_variant = 0
             variants.append({
                 "values": values,
                 "price": price_tn,
@@ -423,7 +435,7 @@ class TiendaNubeResCompanyInherit(models.Model):
                 "gender": variant.sexo_tn if variant.sexo_tn else None,
                 "cost": variant.standard_price if variant.standard_price > 0 else None,
                 "stock_management": True,
-                "stock": variant.qty_available if self.tn_config_stock == 'stock' else variant.virtual_available,
+                "stock": stock_variant,
             })
         data = {
             "name": product.name,
