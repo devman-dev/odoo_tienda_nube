@@ -33,13 +33,16 @@ class WebhookTN(models.Model):
     updated_at_tn = fields.Datetime(string='Fecha de actualización en Tienda Nube')
 
     # Validamos en el wirte y create que la url inicie de forma correcta siendo la url de odoo que figura en paramentros de sistema continuando con /webhook_tn
-    @api.model
-    def create(self, vals):
-        if vals.get('url') and not vals.get('url').startswith(self.env['ir.config_parameter'].sudo().get_param('web.base.url') + '/webhook_tn/'):
-            raise ValidationError('La URL debe iniciar con %s/webhook_tn/' % self.env['ir.config_parameter'].sudo().get_param('web.base.url'))
-        elif vals.get('url') == self.env['ir.config_parameter'].sudo().get_param('web.base.url') + '/webhook_tn/':
-            raise ValidationError('La URL no puede ser la misma que la de Odoo + /webhook_tn/, debe ser de esta manera mas algo por ejemplo: %s/webhook_tn/mi_webhook' % self.env['ir.config_parameter'].sudo().get_param('web.base.url'))
-        return super(WebhookTN, self).create(vals)
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            url_base = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
+            webhook_base_url = url_base + '/webhook_tn/'
+            if vals.get('url') and not vals.get('url').startswith(webhook_base_url):
+                raise ValidationError('La URL debe iniciar con %s/webhook_tn/' % url_base)
+            elif vals.get('url') == webhook_base_url:
+                raise ValidationError('La URL no puede ser la misma que la de Odoo + /webhook_tn/, debe ser de esta manera mas algo por ejemplo: %s/webhook_tn/mi_webhook' % url_base)
+        return super(WebhookTN, self).create(vals_list)
 
     def write(self, vals):
         if vals.get('url') and not vals.get('url').startswith(self.env['ir.config_parameter'].sudo().get_param('web.base.url') + '/webhook_tn/'):

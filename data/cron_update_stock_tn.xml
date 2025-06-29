@@ -1,16 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data>
-        <record id="ir_cron_update_stock_tn" model="ir.cron">
-            <field name="name">Actualizar Stock Tienda Nube</field>
-            <field name="model_id" ref="base.model_res_company"/>
-            <field name="interval_number">5</field>
-            <field name="interval_type">minutes</field>
-            <field name="numbercall">-1</field>
-            <field name="state">code</field>
-            <field name="active" eval="True"/>
-            <field name="user_id" ref="base.user_root"/>
-            <field name="code">
+  <data>
+    <record id="ir_cron_update_stock_tn" model="ir.cron">
+      <field name="name">Actualizar Stock Tienda Nube</field>
+      <field name="model_id" ref="base.model_res_company" />
+      <field name="interval_number">5</field>
+      <field name="interval_type">minutes</field>
+      <field name="state">code</field>
+      <field name="active" eval="True" />
+      <field name="user_id" ref="base.user_root" />
+      <field name="code"><![CDATA[
 companies = model.search([('tiendanube_access_token','!=',False)])
 for company in companies:
   if not company.tn_config_stock_realtime:
@@ -21,7 +20,8 @@ for company in companies:
     for warehouse in warehouses:
       location_id_tn.append(warehouse.location_id_tn)
     if len(location_id_tn) > 0:
-      company.update_product_stock_tn(products, location_id_tn)</field>
-        </record>
-    </data>
+      company.update_product_stock_tn(products, location_id_tn)
+      ]]></field>
+    </record>
+  </data>
 </odoo>

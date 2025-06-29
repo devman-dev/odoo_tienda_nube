@@ -4,7 +4,7 @@
     "summary": """
         Conector de Tienda Nube con Odoo""",
     "category": "Sale",
-    "version": "17.0.1.0.0",
+    "version": "18.0.1.0.0",
     "website": "https://autodidactati.com",
     "author": "Iván Arriola - Autodidacta TI",
     "license": "LGPL-3",

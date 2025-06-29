@@ -79,7 +79,8 @@ class TiendaNubeResCompanyInherit(models.Model):
                 product_template_odoo = self.env['product.template'].create({
                     'id_tn': product['id'],
                     'name': product['name']['es'],
-                    'detailed_type': 'product' if product['requires_shipping'] else 'service',
+                    'type': 'consu' if product['requires_shipping'] else 'service',
+                    'is_storable': True if product['requires_shipping'] else False,
                     'envio_gratis_tn': product['free_shipping'],
                     'mostrar_en_tienda_tn': product['published'],
                     'image_1920': image_template_base64,

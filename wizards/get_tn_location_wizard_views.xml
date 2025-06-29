@@ -9,10 +9,10 @@
                         <h3>Sincroniza los almacenes correspondientes</h3>
                         <group>
                             <field name="locations_ids">
-                                <tree string="Almacenes" create="0" editable="top">
+                                <list string="Almacenes" create="0" editable="top">
                                     <field name="location_id" readonly="1"/>
                                     <field name="warehouse_id"/>
-                                </tree>
+                                </list>
                             </field>
                         </group>
                         <button name="get_all_location" string="Obtener Almacenes de TN" type="object" class="btn-primary"/>

@@ -5,11 +5,11 @@
             <field name="name">category.tn.tree</field>
             <field name="model">category.tn</field>
             <field name="arch" type="xml">
-                <tree>
+                <list>
                     <field name="name"/>
                     <field name="tn_id" readonly="1"/>
                     <field name="parent_id"/>
-                </tree>
+                </list>
             </field>
         </record>
 

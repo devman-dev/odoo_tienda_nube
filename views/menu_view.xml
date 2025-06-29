@@ -7,25 +7,25 @@
     <record id="action_open_coupon_tn" model="ir.actions.act_window">
         <field name="name">Cupones de Tienda Nube</field>
         <field name="res_model">coupon.tn</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
     </record>
      <!-- Logs -->
     <record id="action_open_logs_tn" model="ir.actions.act_window">
         <field name="name">Logs de Tienda Nube</field>
         <field name="res_model">tn.log</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
     </record>
      <!-- Webhooks -->
     <record id="action_open_webhooks_tn" model="ir.actions.act_window">
         <field name="name">Webhooks</field>
         <field name="res_model">webhook.tn</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
     </record>
     <!-- Webhooks Recibidos -->
     <record id="action_open_webhooks_received_tn" model="ir.actions.act_window">
         <field name="name">Webhooks Recibidos</field>
         <field name="res_model">webhook.tn.received</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
         <field name="context">{'create': False}</field>
     </record>
 
@@ -33,7 +33,7 @@
     <record id="action_open_products_tn" model="ir.actions.act_window">
         <field name="name">Productos de TN</field>
         <field name="res_model">product.template</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
         <field name="domain">[('id_tn', '!=', False)]</field>
     </record>
 
@@ -41,7 +41,7 @@
     <record id="action_open_category_tn" model="ir.actions.act_window">
         <field name="name">Categories</field>
         <field name="res_model">category.tn</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
     </record>
 
 

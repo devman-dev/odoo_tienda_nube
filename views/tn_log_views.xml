@@ -5,7 +5,7 @@
         <field name="name">view.tn.log.tree</field>
         <field name="model">tn.log</field>
         <field name="arch" type="xml">
-            <tree decoration-success="level == 'success'" 
+            <list decoration-success="level == 'success'"
                 decoration-info="level == 'info'"
               	decoration-warning="level == 'warning'"
               	decoration-danger="level == 'error'">
@@ -14,7 +14,7 @@
                 <field name="message" readonly="1"/>
                 <field name="level" readonly="1"/>
                 <field name="model" readonly="1"/>
-            </tree>
+            </list>
         </field>
     </record>
     

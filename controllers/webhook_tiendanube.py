@@ -1,8 +1,5 @@
 # -*- coding: utf-8 -*-
 import logging
-import hmac
-import hashlib
-from odoo.tools import base64
 
 import odoo
 import json

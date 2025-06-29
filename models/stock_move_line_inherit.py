@@ -16,14 +16,15 @@ class stock_move_line_inherit_tn(models.Model):
         return res
 
     # Create
-    @api.model
-    def create(self, vals):
-        res = super(stock_move_line_inherit_tn, self).create(vals)
-        _logger.info('*************** company_id: {0}'.format(res.company_id))
-        _logger.info('*************** tn_config_stock_realtime: {0}'.format(res.company_id.tn_config_stock_realtime))
-        if res.company_id.tn_config_stock_realtime:
-            res.actualizar_stock_tn()
-        return res
+    @api.model_create_multi
+    def create(self, vals_list):
+        records = super(stock_move_line_inherit_tn, self).create(vals_list)
+        for rec in records:
+            _logger.info('*************** company_id: {0}'.format(rec.company_id))
+            _logger.info('*************** tn_config_stock_realtime: {0}'.format(rec.company_id.tn_config_stock_realtime))
+            if rec.company_id.tn_config_stock_realtime:
+                rec.actualizar_stock_tn()
+        return records
 
     def actualizar_stock_tn(self):
         #Obtenemos location_id_tn del almacen de donde se hace el movimiento si no tiene no hacemos nada con TN

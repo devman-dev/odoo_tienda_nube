@@ -5,7 +5,7 @@
         <field name="name">view.coupon.tn.tree</field>
         <field name="model">coupon.tn</field>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="name"/>
                 <field name="used" readonly="1"/>
                 <field name="type_tn"/>
@@ -14,7 +14,7 @@
                 <field name="categoria_tn_ids"/>
                 <field name="valid"/>
                 <field name="id_tn"/>
-            </tree>
+            </list>
         </field>
     </record>
     

@@ -314,7 +314,8 @@ class TiendaNubeProductTemplateInherit(models.Model):
             self.mostrar_en_tienda_tn = product['published']
             self.categoria_tn_ids = [(6, 0, categoria_tn_ids)]
             self.image_1920 = image_template_base64
-            self.detailed_type = 'product' if product['requires_shipping'] else 'service'
+            self.type = 'consu' if product['requires_shipping'] else 'service'
+            self.is_storable = True if product['requires_shipping'] else False
             
             #Verificamos si tiene atributos y de ser asi creamos los faltantes, asi como cada una de las variables de esos atributos
             if product['attributes']:
