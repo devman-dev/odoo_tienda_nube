@@ -6,12 +6,12 @@
     "category": "Sale",
     "version": "15.0.1",
     "website": "https://devoo.io",
-    "author": "Iván Arriola - Devoo",
+    "author": "Iván Arriola | Valentin Romero - Devoo",
     "license": "LGPL-3",
     "depends": [
         "base",
         "stock",
-        "sale",
+        "sale_management",
     ],
     "data": [
         "data/product_discount_tn.xml",
