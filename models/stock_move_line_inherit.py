@@ -27,13 +27,14 @@ class stock_move_line_inherit_tn(models.Model):
         return records
 
     def actualizar_stock_tn(self):
-        #Obtenemos location_id_tn del almacen de donde se hace el movimiento si no tiene no hacemos nada con TN
-        location_id_tn = []
-        location_id_tn.append(self.location_id.warehouse_id.location_id_tn)
-        _logger.info('*************** location_id_tn: {0}'.format(location_id_tn))
-        if not location_id_tn[0]:
-            return
-
-        # Actualizamos el stock en Tienda Nube
-        if self.product_id.product_id_tn:
-            self.company_id.update_product_stock_tn(self.product_id, location_id_tn)
+        for rec in self:
+            #Obtenemos location_id_tn del almacen de donde se hace el movimiento si no tiene no hacemos nada con TN
+            location_id_tn = []
+            location_id_tn.append(rec.location_id.warehouse_id.location_id_tn)
+            _logger.info('*************** location_id_tn: {0}'.format(location_id_tn))
+            if not location_id_tn[0]:
+                return
+    
+            # Actualizamos el stock en Tienda Nube
+            if rec.product_id.product_id_tn:
+                rec.company_id.update_product_stock_tn(rec.product_id, location_id_tn)
