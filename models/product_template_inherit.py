@@ -13,7 +13,7 @@ class TiendaNubeProductTemplateInherit(models.Model):
     envio_gratis_tn = fields.Boolean('Envio Gratis Tienda Nube', help="Indica si el producto tiene envio gratis en Tienda Nube")
     mostrar_en_tienda_tn = fields.Boolean('Mostrar en Tienda Nube', help="Indica si el producto se mostrará en Tienda Nube")
     categoria_tn_ids = fields.Many2many('category.tn', string='Categorias Tienda Nube', help="Categorias de Tienda Nube")
-
+    canonical_url = fields.Char('URL Publica', help="URL Publica del producto en Tienda Nube")
     #Campos de variables
     stock_ilimitado_tn = fields.Boolean('Stock Ilimitado en Tienda Nube', help="Stock Ilimitado en Tienda Nube", compute='_compute_stock_ilimitado_tn', inverse='_set_stock_ilimitado_tn')
     precio_promocional_tn = fields.Float('Precio Promocional Tienda Nube', help="Precio promocional de Tienda Nube", compute='_compute_precio_promocional_tn', inverse='_set_precio_promocional_tn')
