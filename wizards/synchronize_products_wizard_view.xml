@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+        <record id="view_synchronize_products_wizard_form" model="ir.ui.view">
+            <field name="name">synchronize.products.wizard.form</field>
+            <field name="model">synchronize.products.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Asignar ID de Productos">
+                        <h3>Sincroniza los productos correspondientes</h3>
+                        <group>
+                            <field name="synchronize_products_ids">
+                                <tree string="Productos" editable="top">
+                                    <field name="product_id" options="{'no_create': True, 'no_open': True}"/>
+                                    <field name="tn_id"/>
+                                </tree>
+                            </field>
+                        </group>
+
+                    <footer>
+                        <button name="set_id_tn" string="Sincronizar" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+
+
+</odoo>
