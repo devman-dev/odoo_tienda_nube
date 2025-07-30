@@ -233,6 +233,13 @@ class TiendaNubeProductTemplateInherit(models.Model):
                 # NOTE: Utilizamos la compañia que tiene seleccionada el usuario actual o en caso contrario la compañia predeterminada de ese usuario
                 company = self.env.company if self.env.company else self.env.user.company_id
                 company.update_product_tn(product)
+    # Metodo de actualizacion de precio desde Odoo a TN
+    def update_price_tn(self):
+        for product in self:
+            if product.id_tn:
+                # NOTE: Utilizamos la compañia que tiene seleccionada el usuario actual o en caso contrario la compañia predeterminada de ese usuario
+                company = self.env.company if self.env.company else self.env.user.company_id
+                company.update_product_price_tn(product)
 
     # Metodo de actualizacion de stock desde Odoo a TN
     def update_stock_tn(self):
