@@ -264,6 +264,27 @@ class TiendaNubeResCompanyInherit(models.Model):
                 return
             # Actualizamos el stock en Tienda Nube
             self.update_product_stock_tn(product, location_id_tn)
+    # Metodo de actualizacion de precio desde Odoo a TN
+    def update_product_price_tn(self, products):
+        headers = self.get_headers_tn()
+        for product in products:
+            categorias = []
+            for variant in product.product_variant_ids.filtered(lambda x: x.product_id_tn != False):
+                url = "https://api.tiendanube.com/v1/%s/products/%s/variants/%s" % (self.tiendanube_id, product.id_tn, variant.product_id_tn)
+                
+                price_tn = self.tn_pricelist_id._get_product_price(variant.product_tmpl_id, quantity=1)
+                if price_tn is None:
+                    price_tn = variant.list_price
+                if self.tn_type_tax == 'not_included':
+                    price_tn = variant.taxes_id.compute_all(price_tn)['total_included']
+                data = {
+                    "promotional_price": variant.precio_promocional_tn,
+                    "cost": variant.standard_price if variant.standard_price > 0 else None,
+                    "price": price_tn,
+                }
+                response = requests.put(url, headers=headers, json=data)
+                if response.status_code != 200:
+                    raise ValidationError('Error al actualizar stock de Tienda Nube: %s' % response.text)
 
     #Actualizamos stock de productos en TN con PATCH /products/stock-price
     def update_product_stock_tn(self, products, location_id_tn):
