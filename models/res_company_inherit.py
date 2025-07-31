@@ -23,6 +23,21 @@ class TiendaNubeResCompanyInherit(models.Model):
         ('included', 'Incluido'),
         ('not_included', 'No incluido'),
     ], string='Tipo de Impuesto Tienda Nube', default='included', help="Si es 'Incluido' el precio incluye el impuesto, si es 'No incluido' el precio no incluye el impuesto")
+
+    # Conf sincronizacion de productos
+    update_product_tn_name = fields.Boolean('Actualizar nombre', default=True, help="Si esta activo se actualiza el nombre del producto en Tienda Nube")
+    update_product_tn_categories = fields.Boolean('Actualizar categorias', default=True, help="Si esta activo se actualizan las categorias del producto en Tienda Nube")
+    update_product_tn_free_shipping = fields.Boolean('Actualizar Envio Gratis', default=True, help="Si esta activo se actualiza el envio gratis del producto en Tienda Nube")
+    update_product_tn_promotional_price = fields.Boolean('Actualizar Precio Promocional', default=True, help="Si esta activo se actualiza el precio promocional en Tienda Nube")
+    update_product_tn_dimensions = fields.Boolean('Actualizar Dimensiones', default=True, help="Si esta activo se actualizan las dimensiones del producto en Tienda Nube")
+    update_product_tn_sku = fields.Boolean('Actualizar SKU', default=True, help="Si esta activo se actualiza el SKU del producto en Tienda Nube")
+    update_product_tn_mpn = fields.Boolean('Actualizar MPN', default=True, help="Si esta activo se actualiza el MPN del producto en Tienda Nube")
+    update_product_tn_age_group = fields.Boolean('Actualizar Rango de Edad', default=True, help="Si esta activo se actualiza el rango de edad del producto en Tienda Nube")
+    update_product_tn_gender = fields.Boolean('Actualizar Sexo', default=True, help="Si esta activo se actualiza el sexo del producto en Tienda Nube")
+    update_product_tn_cost = fields.Boolean('Actualizar Costo', default=True, help="Si esta activo se actualiza el costo del producto en Tienda Nube")
+    update_product_tn_description = fields.Boolean('Actualizar Descripcion', default=True, help="Si esta activo se actualiza la descripcion del producto en Tienda Nube") 
+    update_product_tn_published = fields.Boolean('Actualizar Publicacion', default=True, help="Si esta activo se actualiza la publicacion del producto en Tienda Nube")
+
     def get_all_products_tn(self):
         url = "https://api.tiendanube.com/v1/%s/products" % self.tiendanube_id
         headers = self.get_headers_tn()
@@ -207,12 +222,15 @@ class TiendaNubeResCompanyInherit(models.Model):
                 categorias.append(category.tn_id)
             url = "https://api.tiendanube.com/v1/%s/products/%s" % (self.tiendanube_id, product.id_tn)
             data = {
-                "categories" : categorias,
-                "published": product.mostrar_en_tienda_tn,
-                "free_shipping": product.envio_gratis_tn,
-                "description": product.description_sale,
-                "name": product.name,
+                "categories" : categorias if self.update_product_tn_categories else None,
+                "published": product.mostrar_en_tienda_tn if self.update_product_tn_published else None,
+                "free_shipping": product.envio_gratis_tn if self.update_product_tn_free_shipping else None,
+                "description": product.description_sale if self.update_product_tn_description else None,
+                "name": product.name if self.update_product_tn_name else None,
             }
+            # Eliminar claves con valor None segun confirguracion de la empresa
+            data = {k: v for k, v in data.items() if v is not None}
+
             _logger.info("data: %s", data)
             response = requests.put(url, headers=headers, json=data)
             if response.status_code != 200:
@@ -231,23 +249,26 @@ class TiendaNubeResCompanyInherit(models.Model):
                 if stock_variant < 0:
                     stock_variant = 0
                 data = {
-                    "promotional_price": variant.precio_promocional_tn,
-                    "weight": variant.peso_tn,
-                    "width": variant.ancho_tn,
-                    "height": variant.alto_tn,
-                    "depth": variant.profundidad_tn,
-                    "sku": variant.default_code,
+                    "promotional_price": variant.precio_promocional_tn if self.update_product_tn_promotional_price else None,
+                    "weight": variant.peso_tn if self.update_product_tn_dimensions else None,
+                    "width": variant.ancho_tn if self.update_product_tn_dimensions else None,
+                    "height": variant.alto_tn if self.update_product_tn_dimensions else None,
+                    "depth": variant.profundidad_tn if self.update_product_tn_dimensions else None,
+                    "sku": variant.default_code if self.update_product_tn_sku else None,
                     "barcode": variant.barcode,
-                    "mpn": variant.mpn_tn,
-                    "age_group": variant.rango_edad_tn if variant.rango_edad_tn else None,
-                    "gender": variant.sexo_tn if variant.sexo_tn else None,
-                    "cost": variant.standard_price if variant.standard_price > 0 else None,
-                    "description": variant.product_tmpl_id.description_sale,
-                    "published": variant.product_tmpl_id.mostrar_en_tienda_tn,
-                    "free_shipping": variant.product_tmpl_id.envio_gratis_tn,
+                    "mpn": variant.mpn_tn if self.update_product_tn_mpn else None,
+                    "age_group": variant.rango_edad_tn if variant.rango_edad_tn and self.update_product_tn_age_group else None,
+                    "gender": variant.sexo_tn if variant.sexo_tn and self.update_product_tn_gender else None,
+                    "cost": variant.standard_price if variant.standard_price > 0 and self.update_product_tn_cost else None,
+                    "description": variant.product_tmpl_id.description_sale if self.update_product_tn_description else None,
+                    "published": variant.product_tmpl_id.mostrar_en_tienda_tn if self.update_product_tn_published else None,
+                    "free_shipping": variant.product_tmpl_id.envio_gratis_tn if self.update_product_tn_free_shipping else None,
                     "price": price_tn,
                     "stock": stock_variant,
                 }
+                # Eliminar claves con valor None segun confirguracion de la empresa
+                data = {k: v for k, v in data.items() if v is not None}
+
                 _logger.info("data: %s", data)
                 response = requests.put(url, headers=headers, json=data)
                 _logger.info("Response: %s", response)
