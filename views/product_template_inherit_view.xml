@@ -16,6 +16,7 @@
                 <field name="categ_id" position="after">
                     <field name="categoria_tn_ids" domain="[('tn_id', '!=', False)]" options="{'no_create': True, 'no_create_edit':True}" widget="many2many_tags"/>
                     <field name="id_tn" readonly="1"/>
+                    <field name="canonical_url" readonly="1" widget="url"/>
                     <field name="envio_gratis_tn"/>
                     <field name="mostrar_en_tienda_tn"/>
                     <field name="stock_ilimitado_tn" invisible="product_variant_count > 1"/>
