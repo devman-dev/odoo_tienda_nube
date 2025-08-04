@@ -454,6 +454,7 @@ class TiendaNubeResCompanyInherit(models.Model):
         if response.status_code == 201:
             data = response.json()
             product.id_tn = data['id']
+            product.canonical_url = data['canonical_url']
             #asignamos el id de Tienda Nube a cada variante
             # Variable position para utilizar como bandera e identificar la posicion de las imagenes en el arreglo image devuelto
             position = 0
