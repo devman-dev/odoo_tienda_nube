@@ -24,6 +24,7 @@
         "wizards/create_all_coupon_odoo_views.xml",
         "wizards/create_all_order_odoo_views.xml",
         "wizards/get_tn_location_wizard_views.xml",
+        "wizards/synchronize_products_wizard_view.xml",
         "views/webhook_tn_view.xml",
         "views/res_company_inherit_view.xml",
         "views/menu_view.xml",
