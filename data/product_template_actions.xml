@@ -11,4 +11,17 @@
         record.create_tn()
         ]]></field>
     </record>
+    
+    <record id="server_action_update_price_tn" model="ir.actions.server">
+        <field name="name">Actualizar precio en Tienda Nube</field>
+        <field name="model_id" ref="product.model_product_template"/>
+        <field name="binding_model_id" ref="product.model_product_template"/>
+        <field name="binding_type">action</field>
+        <field name="binding_view_types">tree</field>
+        <field name="state">code</field>
+        <field name="code"><![CDATA[
+        for record in records:
+        record.update_price_tn()
+        ]]></field>
+    </record>
 </odoo>
