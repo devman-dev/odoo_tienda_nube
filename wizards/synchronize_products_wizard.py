@@ -12,7 +12,7 @@ class SynchronizeProductsWizard(models.TransientModel):
     def set_id_tn(self):
         for product in self.synchronize_products_ids:
             if product.tn_id:
-                product.product_id.tn_id = product.tn_id
+                product.product_id.id_tn = product.tn_id
 
 class SynchronizeProductsWizardLine(models.TransientModel):
     _name = 'synchronize.products.wizard.line'
