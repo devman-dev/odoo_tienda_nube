@@ -39,19 +39,24 @@ class TiendaNubeResCompanyInherit(models.Model):
     update_product_tn_published = fields.Boolean('Actualizar Publicacion', default=True, help="Si esta activo se actualiza la publicacion del producto en Tienda Nube")
     
     def get_all_products_tn(self):
-        url = "https://api.tiendanube.com/v1/%s/products" % self.tiendanube_id
+
+        # Tenemos en cuenta paginacion con 30 por pagina, por lo que obtenemos todos los productos hasta encontrarnos con un code 404
         headers = self.get_headers_tn()
-        _logger.info("Headers: %s", headers)
-        _logger.info("URL: %s", url)
-        response = requests.get(url, headers=headers)
-        _logger.info("Response: %s", response)
-        _logger.info("Response: %s", response.text)
-        if response.status_code == 200:
-            data = response.json()
-            _logger.info("Data: %s", data)
-            return data
-        else:
-            raise ValidationError('Error al obtener productos de Tienda Nube: %s' % response.text)
+        products = []
+        for page in range(1, 1000):
+            url = "https://api.tiendanube.com/v1/%s/products?page=%s&per_page=30" % (self.tiendanube_id, page)
+            response = requests.get(url, headers=headers)
+            if response.status_code == 200:
+                data = response.json()
+                if page == 1:
+                    products = data
+                else:
+                    products += data
+            elif response.status_code == 404:
+                break
+            else:
+                raise ValidationError('Error al obtener productos de Tienda Nube: %s' % response.text)
+        return products
 
     def get_headers_tn(self):
         _logger.warning("Access Token: {0}".format(self.tiendanube_access_token))
