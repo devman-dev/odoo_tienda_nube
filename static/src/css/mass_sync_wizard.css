@@ -1,0 +1,6 @@
+.o_dialog .modal-dialog:has(.mass-sync-wizard) {
+    max-width: 85vw;
+}
+.o_dialog .modal-content:has(.mass-sync-wizard) {
+    max-width: 100%;
+}

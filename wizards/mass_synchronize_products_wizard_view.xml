@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+        <record id="view_mass_synchronize_products_wizard_form" model="ir.ui.view">
+            <field name="name">mass.synchronize.products.wizard.form</field>
+            <field name="model">mass.synchronize.products.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Asignar ID de Productos" class="mass-sync-wizard">
+                        <h3>Sincroniza los productos correspondientes</h3>
+                        <field name="synchronize_products_ids" nolabel="1">
+                            <list create="0" delete="0">
+                                <field name="product_id" options="{'no_create': True, 'no_open': True}"/>
+                                <field name="barcode"/>
+                                <field name="product_tn_name"/>
+                                <field name="tn_id"/>
+                                <field name="variant_tn_id"/>
+                            </list>
+                        </field>
+
+                    <footer>
+                        <button name="get_products_sku_tn" string="Obtener Productos de TN por SKU" type="object" class="btn-secondary"/>
+                        <button name="get_products_barcode_tn" string="Obtener Productos de TN por Código de Barras" type="object" class="btn-secondary"/>
+                        <button name="set_id_tn" string="Sincronizar" type="object" class="btn-primary"/>
+                        <button string="Cancelar" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+
+
+</odoo>

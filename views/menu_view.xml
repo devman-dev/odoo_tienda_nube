@@ -102,6 +102,14 @@
         	<field name="view_id" ref="view_synchronize_products_wizard_form"/>
         	<field name="target">new</field>
     </record>
+    <record id="action_mass_synchronize_products_wizard" model="ir.actions.act_window">
+        	<field name="name">Sincronizar Masivamente Productos Existentes</field>
+        	<field name="type">ir.actions.act_window</field>
+        	<field name="res_model">mass.synchronize.products.wizard</field>
+        	<field name="view_mode">form</field>
+        	<field name="view_id" ref="view_mass_synchronize_products_wizard_form"/>
+        	<field name="target">new</field>
+    </record>
     
     <!-- Menu y Menus principales -->
     <menuitem id="menu_tn" name="Tienda Nube" web_icon="odoo_tienda_nube,static/description/icon.png"/>
@@ -123,5 +131,6 @@
         <menuitem id="menu_create_all_coupon_wizard_action" name="Crear/Actualizar Cupones de TN en Odoo" parent="menu_settings_tn" action="action_create_all_coupon_wizard"/>
         <menuitem id="menu_get_tn_location_wizard_action" name="Sincronizar Almacenes de TN en Odoo" parent="menu_settings_tn" action="action_get_tn_location_wizard"/>
         <menuitem id="menu_synchronize_products_wizard_action" name="Sincronizar Productos TN-Odoo" parent="menu_settings_tn" action="action_synchronize_products_wizard"/>
+        <menuitem id="menu_mass_synchronize_products_wizard_action" name="Sincronizar Masivamente Productos TN-Odoo" parent="menu_settings_tn" action="action_mass_synchronize_products_wizard"/>
 
 </odoo>
