@@ -38,6 +38,41 @@ class TiendaNubeResCompanyInherit(models.Model):
     update_product_tn_description = fields.Boolean('Actualizar Descripcion', default=True, help="Si esta activo se actualiza la descripcion del producto en Tienda Nube") 
     update_product_tn_published = fields.Boolean('Actualizar Publicacion', default=True, help="Si esta activo se actualiza la publicacion del producto en Tienda Nube")
     
+    def update_product_images_tn(self, products):
+        headers = self.get_headers_tn()
+        for product in products:
+            if not product.id_tn:
+                continue
+            url = "https://api.tiendanube.com/v1/%s/products/%s" % (self.tiendanube_id, product.id_tn)
+            response_product = requests.get(url, headers=headers)
+            if response_product.status_code == 200:
+                data_products = response_product.json()
+                for variant in data_products['variants']:
+                    product_variant_odoo = product.product_variant_ids.filtered(lambda x: x.product_id_tn == str(variant['id']))
+                    if product_variant_odoo:
+                        #Reemplazamos imagen en TN por la actual - PUT /products/{product_id}/images/{id}
+                        if product_variant_odoo.image_1920:
+                            url_put_image = "https://api.tiendanube.com/v1/%s/products/%s/images/%s" % (self.tiendanube_id, product.id_tn, variant['image_id'])
+                            response_image_variant = requests.put(url_put_image, headers=headers, json={
+                                "src": self.env['ir.config_parameter'].sudo().get_param('web.base.url') + '/ati_tn_product_template_ids/' + str(product_variant_odoo.id),
+                            })
+                            # Si obtenemos un 404 es porque la imagen no existe, por lo que la creamos
+                            if response_image_variant.status_code == 404:
+                                url_post_image = "https://api.tiendanube.com/v1/%s/products/%s/images" % (self.tiendanube_id, product.id_tn)
+                                response_post_image = requests.post(url_post_image, headers=headers, json={
+                                    "src": self.env['ir.config_parameter'].sudo().get_param('web.base.url') + '/ati_tn_product_template_ids/' + str(product_variant_odoo.id),
+                                })
+                # Recorremos ['images'] y eliminamos las que no corresponden a ninguna variante
+                for image in data_products['images']:
+                    existe = False
+                    for variant in data_products['variants']:
+                        if image['id'] == variant['image_id']:
+                            existe = True
+                            break
+                    if not existe:
+                        url_delete_image = "https://api.tiendanube.com/v1/%s/products/%s/images/%s" % (self.tiendanube_id, product.id_tn, image['id'])
+                        response_delete_image = requests.delete(url_delete_image, headers=headers)
+
     def get_all_products_tn(self):
 
         # Tenemos en cuenta paginacion con 30 por pagina, por lo que obtenemos todos los productos hasta encontrarnos con un code 404
