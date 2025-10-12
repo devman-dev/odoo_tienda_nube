@@ -8,6 +8,7 @@
 
                 <header position="inside">
                     <button name="update_tn" string="Actualizar en Tienda Nube" type="object" class="oe_highlight" invisible="id_tn == False"/>
+                    <button name="update_product_image_tn" string="Actualizar Imagen en Tienda Nube" type="object" class="oe_highlight" invisible="id_tn == False"/>
                     <button name="update_stock_tn" string="Actualizar Stock en Tienda Nube" type="object" class="oe_highlight" invisible="id_tn == False"/>
                     <button name="unlink_tn" string="Desvincular en Tienda Nube" type="object" invisible="id_tn == False"/>
                     <button name="create_tn" string="Crear en Tienda Nube" type="object" class="oe_highlight"  invisible="id_tn != False"/>
