@@ -128,8 +128,8 @@ class CouponTn(models.Model):
             "includes_shipping": self.includes_shipping,
             "min_price": self.min_price,
             "category_id": category if len(category) > 0 else None,
-            "start_date": self.start_date if self.start_date else None,
-            "end_date": self.end_date if self.end_date else None,
+            "start_date": fields.Date.to_string(self.start_date) if self.start_date else None,
+            "end_date": fields.Date.to_string(self.end_date) if self.end_date else None,
         }
         _logger.info('Data: %s', data)
         response = requests.post(url, headers=headers, json=data)
