@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_product_image_tn_form" model="ir.ui.view">
+        <field name="name">product.image.tn.view.form</field>
+        <field name="model">product.image.tn</field>
+        <field name="arch" type="xml">
+            <form string="Product Images">
+                <field name="sequence" invisible="1"/>
+                <div class="row o_website_tn_image_modal">
+                    <div class="col-md-6 col-xl-5">
+                        <label for="name" string="Nombre de imagen"/>
+                        <h2><field name="name" placeholder="Nombre de imagen"/></h2>
+                    </div>
+                    <div class="col-md-6 col-xl-7 text-center o_website_tn_image_modal_container">
+                        <div class="row">
+                            <div class="col">
+                                <field name="image_1920" widget="image"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="product_image_tn_view_kanban" model="ir.ui.view">
+        <field name="name">product.image.tn.view.kanban</field>
+        <field name="model">product.image.tn</field>
+        <field name="arch" type="xml">
+            <kanban string="Product Images" default_order="sequence">
+                <field name="id"/>
+                <field name="name"/>
+                <field name="image_1920"/>
+                <field name="sequence" widget="handle"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="card oe_kanban_global_click p-0">
+                            <div class="o_squared_image">
+                                <img class="card-img-top" t-att-src="kanban_image('product.image.tn', 'image_1920', record.id.raw_value)" t-att-alt="record.name.value"/>
+                            </div>
+                            <div class="card-body p-0">
+                                <h4 class="card-title p-2 m-0 bg-200">
+                                    <small><field name="name"/></small>
+                                </h4>
+                            </div>
+                            <!-- below 100 Kb: good -->
+                            <t t-if="record.image_1920.raw_value.length &lt; 100*1000">
+                                <t t-set="size_status" t-value="'text-bg-success'"/>
+                                <t t-set="message">Tamaño de archivo aceptable</t>
+                            </t>
+                            <!-- below 1000 Kb: decent -->
+                            <t t-elif="record.image_1920.raw_value.length &lt; 1000*1000">
+                                <t t-set="size_status" t-value="'text-bg-warning'" />
+                                <t t-set="message">Archivo muy grande. La imagen debería ser optimizada o reducida.</t>
+                            </t>
+                            <!-- above 1000 Kb: bad -->
+                            <t t-else="1">
+                                <t t-set="size_status" t-value="'text-bg-danger'"/>
+                                <t t-set="message">¡Se requiere optimización! Reduzca el tamaño de la imagen o aumente la compresión.</t>
+                            </t>
+                            <span t-attf-class="badge #{size_status} o_product_image_size" t-esc="record.image_1920.value" t-att-title="message"/>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+</odoo>

@@ -17,8 +17,6 @@ class CategoryTn(models.Model):
             company = rec.env.company if rec.env.company else rec.env.user.company_id
             url = "https://api.tiendanube.com/v1/%s/categories" % company.tiendanube_id
             headers = company.get_headers_tn()
-            _logger.info("Headers: %s", headers)
-            _logger.info("URL: %s", url)
             if rec.tn_id:
                 method = "PUT"
                 url = "%s/%s" % (url, rec.tn_id)
@@ -28,9 +26,7 @@ class CategoryTn(models.Model):
                 "name": rec.name,
                 "parent": rec.parent_id.tn_id if rec.parent_id else None
             }
-            _logger.info("Data: %s", data)
             response = requests.request(method, url, headers=headers, json=data)
-            _logger.info("Response: %s", response)
 
             if response.status_code == 201:
                 response_data = response.json()
@@ -54,7 +50,6 @@ class CategoryTn(models.Model):
             response = requests.get(url, headers=headers)
             if response.status_code == 200:
                 response_data = response.json()
-                _logger.info("Response Data: %s", response_data)
                 rec.name = response_data['name']['es']
                 parent = False
                 if response_data['parent'] != 0:
