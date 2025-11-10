@@ -24,7 +24,6 @@ class GetTnLocationWizard(models.TransientModel):
         # NOTE: Utilizamos la compañia que tiene seleccionada el usuario actual o en caso contrario la compañia predeterminada de ese usuario
         company = self.env.company if self.env.company else self.env.user.company_id
         locations = company.get_location_tn()
-        _logger.warning(locations)
         for location in locations:
             self.locations_ids.create({'wizard_id': self.id, 'location_id': location['name']['es_AR'] + ' | ' + location['address']['city'] + ' | ID:' + location['id']})
 

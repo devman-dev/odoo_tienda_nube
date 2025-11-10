@@ -36,6 +36,8 @@ class TiendaNubeProductTemplateInherit(models.Model):
         ('male', 'Masculino'),
         ('female', 'Femenino'),
     ], string='Sexo', help="Sexo en Tienda Nube", default='unisex', compute='_compute_sexo_tn', inverse='_set_sexo_tn')
+    contemplar_imagen_variantes_tn = fields.Boolean('Contemplar imagen de variantes en Tienda Nube', help="Indica si se debe contemplar la imagen de las variantes al crear el producto o actualizar imagenes en Tienda Nube", default=True)
+    product_template_image_tn_ids = fields.One2many('product.image.tn', 'product_tmpl_tn_id', 'Imagenes de Tienda Nube', help="Imagenes del producto en Tienda Nube", copy=True)
     # stock_ilimitado_tn
     @api.depends('product_variant_ids.stock_ilimitado_tn')
     def _compute_stock_ilimitado_tn(self):
@@ -321,8 +323,7 @@ class TiendaNubeProductTemplateInherit(models.Model):
                 response = requests.get(url_imagen)
                 if response.status_code == 200:
                     image_template_base64 = base64.b64encode(response.content)
-                    
-            _logger.info("Data: %s", product)
+
             self.name = product['name']['es']
             self.description_sale = product['description']['es']
             self.id_tn = product['id']
@@ -338,7 +339,6 @@ class TiendaNubeProductTemplateInherit(models.Model):
 
                 index = 0 # Flag para recorrer los valores de las variantes ya que vinen ordenados segun el orden de los atributos
                 for attribute in product['attributes']:
-                    _logger.info("Attribute: %s", attribute)
                     #Buscamos si existe el atributo
                     attribute_odoo = self.env['product.attribute'].search([('name', '=', attribute['es'])])
                     if not attribute_odoo:
@@ -379,7 +379,6 @@ class TiendaNubeProductTemplateInherit(models.Model):
                                 })
             #Recorremos variantes
             for variant in product['variants']:
-                _logger.info("Variant: %s", variant)
 
                 #Creo una lista para lugo usarla para buscar el product.product que tenga los atributos y valores guardados
                 atributos = []
@@ -413,7 +412,6 @@ class TiendaNubeProductTemplateInherit(models.Model):
                             break
                     #Obtenida la url converitmos la imagen a base64 y guardamos
                     if url_imagen:
-                        _logger.info("URL Imagen: %s", url_imagen)
                         response = requests.get(url_imagen)
                         if response.status_code == 200:
                             image_base64 = base64.b64encode(response.content)
@@ -439,11 +437,9 @@ class TiendaNubeProductTemplateInherit(models.Model):
                         'barcode': variant['barcode'] if not product_barcode_exist else False,
                         'default_code': variant['sku'],
                     })
-            _logger.info("********** Finalizacion de creacion: %s", self.name)
 
 
 
         else:
-            _logger.info("Error: %s", response.text)
             raise ValidationError(_("Error al crear el producto"))
 

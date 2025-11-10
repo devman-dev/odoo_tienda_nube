@@ -63,7 +63,6 @@ class SaleOrderTiendaNubeInherit(models.Model):
         if self.state != 'draft':
             raise ValidationError(_("La orden de venta debe estar en estado Borrador para poder ser editada por Tienda Nube"))
         try:
-            _logger.info("Create Order from TN")
             if self.env.context.get('company_id'):
                 company = self.env['res.company'].browse(self.env.context.get('company_id'))
             else:
@@ -72,10 +71,8 @@ class SaleOrderTiendaNubeInherit(models.Model):
             headers = company.get_headers_tn()
             url = "https://api.tiendanube.com/v1/%s/orders/%s?aggregates=fulfillment_orders" % (company.tiendanube_id, self.id_tn)
             response = requests.get(url, headers=headers)
-            _logger.info("Response: %s", response.text)
             if response.status_code == 200:
                 order = response.json()
-                _logger.info("Data: %s", order)
 
                 # Limpiamos lineas de la orden en el caso de que se este actualizando a fuerza
                 if self.state == 'draft':
@@ -152,7 +149,6 @@ class SaleOrderTiendaNubeInherit(models.Model):
                 
                 # Completamos lineas de la orden
                 for line in order['products']:
-                    _logger.info("Line: %s", line['product_id'])
                     product = self.env['product.product'].search([('product_id_tn', '=', line['variant_id'])], limit=1)
                     
                     if not product:
@@ -186,7 +182,6 @@ class SaleOrderTiendaNubeInherit(models.Model):
                     )
 
                     # Verificamos por cupones de descuento
-                    _logger.info("************** Coupons1: %s", order['coupon'])
                     for coupon in order['coupon']:
                         coupon_tn = self.env['coupon.tn'].search([('id_tn', '=', coupon['id'])], limit=1)
                         if not coupon_tn:
@@ -211,10 +206,8 @@ class SaleOrderTiendaNubeInherit(models.Model):
                             'price_unit': order['discount_coupon'],
                         }).write({'tax_id': False})
                     # Verificamos por promociones aplicadas
-                    _logger.info("************** Promotions: %s", order['promotional_discount'])
                     if 'promotions_applied' in order['promotional_discount']:
                         for promotions_applied in order['promotional_discount']['promotions_applied']:
-                            _logger.info("************** promotions_applied: %s", promotions_applied)
                             if self.promotions_applied_tn:
                                 self.promotions_applied_tn += "Tipo: " + promotions_applied['discount_script_type'] + " - Descuento: " + promotions_applied['total_discount_amount_short'] + "\n"
                             else:

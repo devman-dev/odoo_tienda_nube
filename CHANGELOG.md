@@ -1,5 +1,14 @@
 # Changelog — Tienda Nube ⇆ Odoo Connector
 
+## [18.0.3.0.0] - 2025-11-10
+### Added
+- Permite contemplar **imágenes de variantes** tanto en la creación como en la actualización de imágenes en `product.template`, **a elección**.
+- **CRON** para la actualización diaria de precios de productos.
+- Arreglo en la publicación con más de 8 variantes.
+- Asignación automática de código de barras al publicar productos en Tienda Nube.
+- Limpieza de logger.
+- **Galería de imágenes**: soporte para publicación y actualización de múltiples imágenes por producto.
+
 ## [18.0.2.0.0] - 2025-10-13
 ### Added
 - Versión base para Odoo 15/16/17/18.

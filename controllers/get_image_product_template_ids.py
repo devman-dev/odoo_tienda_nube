@@ -17,3 +17,12 @@ class PublicController(http.Controller):
 
         headers = [('Content-Type', f'image/{image_format.lower()}')]
         return request.make_response(binary_data, headers)
+    
+    @http.route('/ati_tn_product_template_galery_ids/<int:id>', type='http', auth='public')
+    def serve_image_galery(self, id, **kwargs):
+        record = request.env['product.image.tn'].sudo().browse(id)
+        binary_data = base64.b64decode(record.image_1920) 
+        image_format = imghdr.what(None, binary_data) or 'png'
+    
+        headers = [('Content-Type', f'image/{image_format.lower()}')]
+        return request.make_response(binary_data, headers)

@@ -76,7 +76,6 @@ class CouponTn(models.Model):
             data['start_date'] = self.start_date
         if self.end_date:
             data['end_date'] = self.end_date
-        _logger.info('Data: %s', data)
         response = requests.put(url, headers=headers, json=data)
         if response.status_code == 200:
             data = response.json()
@@ -131,7 +130,6 @@ class CouponTn(models.Model):
             "start_date": fields.Date.to_string(self.start_date) if self.start_date else None,
             "end_date": fields.Date.to_string(self.end_date) if self.end_date else None,
         }
-        _logger.info('Data: %s', data)
         response = requests.post(url, headers=headers, json=data)
         if response.status_code == 201:
             data = response.json()

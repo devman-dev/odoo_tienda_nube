@@ -29,7 +29,6 @@ class TiendaNubeWebHook(http.Controller):
         # Verificación de locking
         lock_name = 'webhook_processing'
         if request.env['ir.config_parameter'].sudo().get_param(lock_name) == 'En uso':
-            _logger.info('******* lock_name encontrado y rebotado')
             return request.make_response(
                 json.dumps({"mensaje": "Otra solicitud está en proceso"}),
                 headers={'Content-Type': 'application/json'},
@@ -64,7 +63,6 @@ class TiendaNubeWebHook(http.Controller):
 
             if 'code_event' in kw:
                 code_event = kw['code_event']
-                _logger.info('code_event: %s' % code_event)
                 webhook = request.env['webhook.tn'].sudo().search([
                     ('url','=',request.env['ir.config_parameter'].sudo().get_param('web.base.url') + '/webhook_tn/' + code_event)
                     ],limit=1)
@@ -125,7 +123,6 @@ class TiendaNubeWebHook(http.Controller):
                             product.sudo().with_company(company_id).create_update_product_from_tn()
                             exitoso = True
                         except Exception as e:
-                            _logger.info('*********** Error: %s' % e)
                             return request.make_response(
                                 json.dumps({"mensaje": "Error al crear el producto"}),
                                 headers={'Content-Type': 'application/json'},
@@ -142,7 +139,6 @@ class TiendaNubeWebHook(http.Controller):
                             try:
                                 product.sudo().with_company(company_id).create_update_product_from_tn()
                             except Exception as e:
-                                _logger.info('*********** Error: %s' % e)
                                 return request.make_response(
                                     json.dumps({"mensaje": "Error al actualizar el producto"}),
                                     headers={'Content-Type': 'application/json'},
@@ -195,7 +191,6 @@ class TiendaNubeWebHook(http.Controller):
                         status=404
                     )
         except Exception as e:
-            _logger.info('*********** Error: %s' % e)
             request.env['ir.config_parameter'].sudo().set_param(lock_name, 'Disponible')
             return request.make_response(
                 json.dumps({"mensaje": "Error al procesar la solicitud"}),

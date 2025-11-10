@@ -15,6 +15,7 @@
                             <field name="tn_config_stock"/>
                             <field name="tn_config_stock_realtime"/>
                             <field name="tn_pricelist_id" options="{'no_create': True, 'no_create_edit': True}"/>
+                            <field name="tn_config_update_product_price_cron"/>
                             <field name="tn_type_tax"/>
                         </group>
                         <group>
