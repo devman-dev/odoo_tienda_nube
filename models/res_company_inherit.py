@@ -4,6 +4,7 @@ from odoo import _, api, fields, models
 from odoo.exceptions import ValidationError
 import requests
 import base64
+import random
 
 _logger = logging.getLogger(__name__)
 
@@ -19,6 +20,7 @@ class TiendaNubeResCompanyInherit(models.Model):
     tn_config_confirmation_sale = fields.Boolean('Confirmar venta', help="Si esta activo se confirma la venta al crear la orden de venta, sino se deja en estado borrador")
     tn_config_stock_realtime = fields.Boolean('Stock en tiempo real', help="Si esta activo se actualiza el stock en tiempo real, sino se actualiza cada 30 minutos")
     tn_pricelist_id = fields.Many2one('product.pricelist', string='Lista de Precios Tienda Nube', help="Lista de precios que se usara para los productos de Tienda Nube", required=True)
+    tn_config_update_product_price_cron = fields.Boolean('Actualizar precios cada X tiempo', help="Si esta activo se actualizan los precios de los productos en Tienda Nube automaticamente cada dia o segun temporalidad en el cron configurado")
     tn_type_tax = fields.Selection([
         ('included', 'Incluido'),
         ('not_included', 'No incluido'),
@@ -62,6 +64,14 @@ class TiendaNubeResCompanyInherit(models.Model):
                                 response_post_image = requests.post(url_post_image, headers=headers, json={
                                     "src": self.env['ir.config_parameter'].sudo().get_param('web.base.url') + '/ati_tn_product_template_ids/' + str(product_variant_odoo.id),
                                 })
+                        # Si no se contemplan las variantes breake al ciclo para que solo cargue una imagen principal
+                        if not product.contemplar_imagen_variantes_tn:
+                            # Borramos todas las demas imagenes que no corresponden a la variante principal
+                            for imagen in data_products['variants']:
+                                if imagen['image_id'] != variant['image_id']:
+                                    url_delete_image = "https://api.tiendanube.com/v1/%s/products/%s/images/%s" % (self.tiendanube_id, product.id_tn, imagen['image_id'])
+                                    response_delete_image = requests.delete(url_delete_image, headers=headers)
+                            break     
                 # Recorremos ['images'] y eliminamos las que no corresponden a ninguna variante
                 for image in data_products['images']:
                     existe = False
@@ -72,6 +82,13 @@ class TiendaNubeResCompanyInherit(models.Model):
                     if not existe:
                         url_delete_image = "https://api.tiendanube.com/v1/%s/products/%s/images/%s" % (self.tiendanube_id, product.id_tn, image['id'])
                         response_delete_image = requests.delete(url_delete_image, headers=headers)
+
+                # Publicamos imagenes de galeria si existen
+                for image in product.product_template_image_tn_ids:
+                    url_post_image = "https://api.tiendanube.com/v1/%s/products/%s/images" % (self.tiendanube_id, product.id_tn)
+                    response_post_image = requests.post(url_post_image, headers=headers, json={
+                        "src": self.env['ir.config_parameter'].sudo().get_param('web.base.url') + '/ati_tn_product_template_galery_ids/' + str(image.id),
+                    })
 
     def get_all_products_tn(self):
 
@@ -94,7 +111,6 @@ class TiendaNubeResCompanyInherit(models.Model):
         return products
 
     def get_headers_tn(self):
-        _logger.warning("Access Token: {0}".format(self.tiendanube_access_token))
         return {
             "Authentication": "bearer " + self.tiendanube_access_token,
             "Content-Type": "application/json",
@@ -107,7 +123,6 @@ class TiendaNubeResCompanyInherit(models.Model):
         self.get_all_categories_tn()
         products = self.get_all_products_tn()
         for product in products:
-            _logger.info("Product: %s", product)
             #Verificamos si existe el product_template
             product_template_odoo = self.env['product.template'].search([('id_tn', '=', product['id'])])
 
@@ -147,7 +162,6 @@ class TiendaNubeResCompanyInherit(models.Model):
 
                 index = 0 # Flag para recorrer los valores de las variantes ya que vinen ordenados segun el orden de los atributos
                 for attribute in product['attributes']:
-                    _logger.info("Attribute: %s", attribute)
                     #Buscamos si existe el atributo
                     attribute_odoo = self.env['product.attribute'].search([('name', '=', attribute['es'])])
                     if not attribute_odoo:
@@ -188,7 +202,6 @@ class TiendaNubeResCompanyInherit(models.Model):
                                 })
             #Recorremos variantes
             for variant in product['variants']:
-                _logger.info("Variant: %s", variant)
 
                 #Creo una lista para lugo usarla para buscar el product.product que tenga los atributos y valores guardados
                 atributos = []
@@ -222,7 +235,6 @@ class TiendaNubeResCompanyInherit(models.Model):
                             break
                     #Obtenida la url converitmos la imagen a base64 y guardamos
                     if url_imagen:
-                        _logger.info("URL Imagen: %s", url_imagen)
                         response = requests.get(url_imagen)
                         if response.status_code == 200:
                             image_base64 = base64.b64encode(response.content)
@@ -246,7 +258,6 @@ class TiendaNubeResCompanyInherit(models.Model):
                         'barcode': variant['barcode'] if not product_barcode_exist else False,
                         'default_code': variant['sku'],
                     })
-            _logger.info("********** Finalizacion de creacion/actualizacion: %s", product_template_odoo.name)
 
     # Metodo de actualizacion desde Odoo a TN
     def update_product_tn(self, products):
@@ -270,15 +281,12 @@ class TiendaNubeResCompanyInherit(models.Model):
             # Eliminar claves con valor None segun confirguracion de la empresa
             data = {k: v for k, v in data.items() if v is not None}
 
-            _logger.info("data: %s", data)
             response = requests.put(url, headers=headers, json=data)
             if response.status_code != 200:
                 raise ValidationError('Error al actualizar producto %s%s en Tienda Nube: %s' % (product.id, product.name, response.text))
             for variant in product.product_variant_ids.filtered(lambda x: x.product_id_tn != False):
                 url = "https://api.tiendanube.com/v1/%s/products/%s/variants/%s" % (self.tiendanube_id, product.id_tn, variant.product_id_tn)
                 
-                _logger.info("Headers: %s", headers)
-                _logger.info("URL: %s", url)
                 price_tn = self.tn_pricelist_id._get_product_price(variant.product_tmpl_id, quantity=1)
                 if price_tn is None:
                     price_tn = variant.list_price
@@ -307,10 +315,7 @@ class TiendaNubeResCompanyInherit(models.Model):
                 }
                 # Eliminar claves con valor None segun confirguracion de la empresa
                 data = {k: v for k, v in data.items() if v is not None}
-                _logger.info("data: %s", data)
                 response = requests.put(url, headers=headers, json=data)
-                _logger.info("Response: %s", response)
-                _logger.info("Response: %s", response.text)
                 if response.status_code != 200:
                     raise ValidationError('Error al actualizar stock de Tienda Nube: %s' % response.text)
             # Hacemos un commit y procedemos a actulizar stock por warehouse
@@ -355,8 +360,6 @@ class TiendaNubeResCompanyInherit(models.Model):
         
         url = "https://api.tiendanube.com/v1/%s/products/stock-price" % self.tiendanube_id
         headers = self.get_headers_tn()
-        _logger.info("Headers: %s", headers)
-        _logger.info("URL: %s", url)
         
         # Preparar datos de productos
         data_products = []
@@ -415,10 +418,7 @@ class TiendaNubeResCompanyInherit(models.Model):
         batches = split_batches(data_products, 40)
         
         for batch in batches:
-            _logger.info("Sending batch: %s", batch)
             response = requests.patch(url, headers=headers, json=batch)
-            _logger.info("Response: %s", response)
-            _logger.info("Response text: %s", response.text)
             if response.status_code != 200:
                 raise ValidationError('Error al actualizar stock de Tienda Nube: %s' % response.text)
 
@@ -451,7 +451,6 @@ class TiendaNubeResCompanyInherit(models.Model):
                         'name': category['name']['es'],
                         'parent_id': parent,
                     })
-            _logger.info("Data: %s", data)
             return data
         else:
             raise ValidationError('Error al obtener categorias de Tienda Nube: %s' % response.text)
@@ -468,15 +467,26 @@ class TiendaNubeResCompanyInherit(models.Model):
         # Obtenemos url de Odoo desde los parametros de sistema
         url_odoo = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
         images = []
-        cant_images = 1 # Contador de imagenes, como maximo se pueden subir 9 imagenes a TN
-        for variant in product.product_variant_ids:
-            if variant.image_1920:
-                images.append({
-                    "src": url_odoo + '/ati_tn_product_template_ids/' + str(variant.id),
-                })
-            cant_images += 1
-            if cant_images == 9:
-                break
+        if product.contemplar_imagen_variantes_tn:
+            cant_images = 1 # Contador de imagenes, como maximo se pueden subir 9 imagenes a TN
+            for variant in product.product_variant_ids:
+                if variant.image_1920:
+                    images.append({
+                        "src": url_odoo + '/ati_tn_product_template_ids/' + str(variant.id),
+                    })
+                cant_images += 1
+                if cant_images == 9:
+                    break
+        else:
+            images.append({
+                "src": url_odoo + '/ati_tn_product_template_ids/' + str(product.product_variant_ids[0].id),
+            })
+        
+        #Agregamos imagenes de galeria si existen
+        for image_galery in product.product_template_image_tn_ids:
+            images.append({
+                "src": url_odoo + '/ati_tn_product_template_galery_ids/' + str(image_galery.id),
+            })
 
         categorias = []
         for category in product.categoria_tn_ids:
@@ -490,7 +500,11 @@ class TiendaNubeResCompanyInherit(models.Model):
                 attributes.append(attribute.attribute_id.name)
         for variant in product.product_variant_ids:
             if not variant.barcode:
-                raise ValidationError('El producto %s no tiene codigo de barras' % variant.name)
+                # Si no tiene codigo de barras le asginamos un EAN-13 temporal verificando que ningun otro producto lo tenga
+                temp_barcode = random.randint(2000000000000, 2999999999999)
+                while self.env['product.product'].search([('barcode', '=', str(temp_barcode))]):
+                    temp_barcode = random.randint(2000000000000, 2999999999999)
+                variant.barcode = str(temp_barcode)
             values = []
             for value in variant.product_template_attribute_value_ids:
                 values.append(value.name)
@@ -529,10 +543,7 @@ class TiendaNubeResCompanyInherit(models.Model):
             "attributes": attributes,
             "images": images,
         }
-        _logger.info("data: %s", data)
         response = requests.post(url, headers=headers, json=data)
-        _logger.info("Response: %s", response)
-        _logger.info("Response: %s", response.text)
         if response.status_code == 201:
             data = response.json()
             product.id_tn = data['id']
@@ -543,15 +554,18 @@ class TiendaNubeResCompanyInherit(models.Model):
             for v in data['variants']:
                 variant = product.product_variant_ids.filtered(lambda x: x.barcode.replace(' ', '') == v['barcode'])
                 variant.product_id_tn = v['id']
-                if 'images' in data and len(data['images']) > 0:
+                # Si se contemplan imagenes por variantes, asignamos la imagen correspondiente a la variante
+                if product.contemplar_imagen_variantes_tn and 'images' in data and len(data['images']) > 0:
                     #Modificamos la imagenes de la variante en tienda nube
                     url_put_image = "https://api.tiendanube.com/v1/%s/products/%s/variants/%s" % (self.tiendanube_id, v['product_id'], v['id'])
                     data_variant_image = {
                         "image_id": data['images'][position]['id'],
                     }
                     response_image_variant = requests.put(url_put_image, headers=headers, json=data_variant_image)
-                    _logger.info("Response: %s", response_image_variant.text)
                 position += 1
+                # [images] siempre trae como maximo 8 imagenes, por lo que si hay mas variantes no se asignan imagenes y debemos hacer un break para evitar un "list index out of range"
+                if position >= 8:
+                    break
 
         else:
             raise ValidationError('Error al crear producto en Tienda Nube: %s' % response.text)
@@ -574,7 +588,6 @@ class TiendaNubeResCompanyInherit(models.Model):
         response = requests.get(url, headers=headers)
         if response.status_code == 200:
             data = response.json()
-            _logger.info("Data: %s", data)
             # Segun respuesta crearmos webhooks en nuestro modelo webhook.tn
             for webhook in data:
                 webhook_odoo = self.env['webhook.tn'].search([('id_webhook_tn', '=', webhook['id'])])
@@ -604,7 +617,6 @@ class TiendaNubeResCompanyInherit(models.Model):
         response = requests.get(url, headers=headers)
         if response.status_code == 200:
             data = response.json()
-            _logger.info("Data: %s", data)
             # Segun respuesta crearmos cupones en nuestro modelo coupon.tn
             for coupon in data:
                 coupon_odoo = self.env['coupon.tn'].search([('id_tn', '=', coupon['id'])])
@@ -651,7 +663,6 @@ class TiendaNubeResCompanyInherit(models.Model):
         response = requests.get(url, headers=headers)
         if response.status_code == 200:
             data = response.json()
-            _logger.info("Data: %s", data)
             # Segun respuesta crearmos ordenes en nuestro modelo sale.order
             for order in data:
                 order_odoo = self.env['sale.order'].search([('id_tn', '=', order['id'])])
@@ -679,7 +690,6 @@ class TiendaNubeResCompanyInherit(models.Model):
         response = requests.get(url, headers=headers)
         if response.status_code == 200:
             data = response.json()
-            _logger.info("Data: %s", data)
             return data
         else:
             return False

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="ir_cron_update_product_price_tn" model="ir.cron">
+            <field name="name">Actualizar Precios en Tienda Nube</field>
+            <field name="model_id" ref="base.model_res_company"/>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field name="state">code</field>
+            <field name="active" eval="True"/>
+            <field name="user_id" ref="base.user_root"/>
+            <field name="code">
+companies = model.search([('tiendanube_access_token','!=',False)])
+for company in companies:
+  if company.tn_config_update_product_price_cron:
+    products = env['product.template'].search([('id_tn', '!=', False)])
+    for product in products:
+      company.update_product_price_tn(product)</field>
+        </record>
+    </data>
+</odoo>
