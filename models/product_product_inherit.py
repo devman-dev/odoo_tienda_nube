@@ -32,10 +32,13 @@ class TiendaNubeProductProductInherit(models.Model):
         ('female', 'Femenino'),
     ], string='Sexo', help="Sexo en Tienda Nube", default='unisex')
 
-    # Sobreescribimos unlink para que no se pueda borrar producto de descuento de Tienda Nube
+    # Sobreescribimos unlink para que no se pueda borrar producto de descuento y envio de Tienda Nube
     def unlink(self):
         product_discount_tn = self.env.ref('odoo_tienda_nube.product_discount_tn')
+        product_shipping_tn = self.env.ref('odoo_tienda_nube.product_shipping_tn')
         for product in self:
             if product.id == product_discount_tn.id:
                 raise ValidationError(_("No se puede borrar el producto de descuento de Tienda Nube"))
+            if product.id == product_shipping_tn.id:
+                raise ValidationError(_("No se puede borrar el producto de envío de Tienda Nube"))
         return super(TiendaNubeProductProductInherit, self).unlink()
