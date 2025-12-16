@@ -1,5 +1,10 @@
 # Changelog — Tienda Nube ⇆ Odoo Connector
 
+## [17.0.4.0.0] - 2025-12-16
+### Added
+- Se agrega una línea de venta específica para los envíos.
+- Se incorpora un producto de tipo servicio, utilizado automáticamente como concepto de envío.
+
 ## [17.0.3.0.0] - 2025-11-10
 ### Added
 - Permite contemplar **imágenes de variantes** tanto en la creación como en la actualización de imágenes en `product.template`, **a elección**.

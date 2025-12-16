@@ -223,9 +223,12 @@ class TiendaNubeProductTemplateInherit(models.Model):
     # Sobreescribimos unlink para que no se pueda borrar producto de descuento de Tienda Nube
     def unlink(self):
         product_discount_tn = self.env.ref('odoo_tienda_nube.product_discount_tn_product_template')
+        product_shipping_tn = self.env.ref('odoo_tienda_nube.product_shipping_tn_product_template')
         for product in self:
             if product.id == product_discount_tn.id:
                 raise ValidationError(_("No se puede borrar el producto de descuento de Tienda Nube"))
+            if product.id == product_shipping_tn.id:
+                raise ValidationError(_("No se puede borrar el producto de envío de Tienda Nube"))
         return super(TiendaNubeProductTemplateInherit, self).unlink()
     
     # Metodo de actualizacion de imagenes desde Odoo a TN

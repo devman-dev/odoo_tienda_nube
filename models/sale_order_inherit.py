@@ -219,6 +219,25 @@ class SaleOrderTiendaNubeInherit(models.Model):
                                 'product_uom_qty': -1,
                                 'price_unit': promotions_applied['total_discount_amount'],
                             }).write({'tax_id': False})
+                            
+                # ENVIO
+                product_shipping_tn = self.env.ref('odoo_tienda_nube.product_shipping_tn')
+                if not product_shipping_tn:
+                    raise ValidationError(_("Producto de envio no encontrado en Odoo"))
+                
+                #Verificamos si tenemos que quitar impuestos
+                price_shipping = float(order['shipping_cost_customer'])
+                if self.company_id.tn_type_tax == 'not_included':
+                    value_tax = (((product_shipping_tn.taxes_id.compute_all(price_shipping)['total_included']) * 100) / (product_shipping_tn.taxes_id.compute_all(price_shipping)['total_excluded'])) / 100
+                    price_shipping = price_shipping / value_tax
+
+                self.env['sale.order.line'].create({
+                    'name': 'Costo de Envío (' + order['shipping_option'] + ')',
+                    'order_id': self.id,
+                    'product_id': product_shipping_tn.id,
+                    'product_uom_qty': 1,
+                    'price_unit': price_shipping,
+                })
 
                 #Verificamos si hay Almacen de salida
                 if len(order['fulfillments']) > 0:

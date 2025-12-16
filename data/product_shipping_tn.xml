@@ -1,7 +1,7 @@
 <odoo>
     <data>
-        <record id="product_discount_tn" model="product.product">
-            <field name="name">Descuento Tienda Nube</field>
+        <record id="product_shipping_tn" model="product.product">
+            <field name="name">Envio Tienda Nube</field>
             <field name="type">service</field>
             <field name="list_price">0.0</field>
             <field name="sale_ok">True</field>
