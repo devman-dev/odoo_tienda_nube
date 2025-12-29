@@ -1,5 +1,9 @@
 # Changelog — Tienda Nube ⇆ Odoo Connector
 
+## [17.0.5.0.0] - 2025-12-29
+### Fixed
+- Se completa variant_id en sincronización masiva cuando el producto no tiene variantes.
+
 ## [17.0.4.0.0] - 2025-12-16
 ### Added
 - Se agrega una línea de venta específica para los envíos.
