@@ -19,6 +19,7 @@ class MassSynchronizeProductsWizard(models.TransientModel):
                     if not product.product_id.product_tmpl_id.id_tn:
                         product.product_id.product_tmpl_id.id_tn = product.tn_id
                 else:
+                    product.product_id.product_id_tn = product.variant_tn_id
                     product.product_id.product_tmpl_id.id_tn = product.tn_id
 
     def get_products_barcode_tn(self):
@@ -77,7 +78,7 @@ class MassSynchronizeProductsWizard(models.TransientModel):
                             line = {
                                 'product_id': product_tmp.id,
                                 'tn_id': str(product['id']),
-                                'variant_tn_id': str(variant['id']) if len(product['variants']) > 1 else str(product['id']),
+                                'variant_tn_id': str(variant['id']),
                                 'product_tn_name': product['name']['es'] + " SKU: " + variant['sku'] if 'name' in product else '',
                             }
                             lines.append((0, 0, line))
