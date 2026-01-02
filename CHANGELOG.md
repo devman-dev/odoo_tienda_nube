@@ -1,5 +1,9 @@
 # Changelog — Tienda Nube ⇆ Odoo Connector
 
+## [16.0.6.0.0] - 2026-01-02
+### Fixed
+- Se modifica algorimo de actualización de precios para evitar el límite de solicitudes de Tienda Nube al realizar actualizaciones masivas.
+
 ## [16.0.5.0.0] - 2025-12-16
 ### Fixed
 - Se completa variant_id en sincronización masiva cuando el producto no tiene variantes.
