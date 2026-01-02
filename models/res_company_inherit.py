@@ -329,13 +329,49 @@ class TiendaNubeResCompanyInherit(models.Model):
             # Actualizamos el stock en Tienda Nube
             self.update_product_stock_tn(product, location_id_tn)
 
+    # Dividir en lotes de hasta 40 variantes
+    def _split_batches(self, products, max_variants):
+        batches = []
+        current_batch = []
+        current_variants_count = 0
+        
+        for product in products:
+            product_variants_count = len(product["variants"])
+            
+            if current_variants_count + product_variants_count > max_variants:
+                batches.append(current_batch)
+                current_batch = []
+                current_variants_count = 0
+            
+            current_batch.append(product)
+            current_variants_count += product_variants_count
+        
+        if current_batch:
+            batches.append(current_batch)
+        
+        return batches 
+
     # Metodo de actualizacion de precio desde Odoo a TN
     def update_product_price_tn(self, products):
+        # Contar total de variantes
+        total_variants = 0
+        for product in products:
+            total_variants += len(product.product_variant_ids.filtered(lambda x: x.product_id_tn != False))
+
+        # Si tiene 5 o menos variantes el total de productos, usar ruta individual (PUT)
+        if total_variants <= 5:
+            self._update_product_price_tn_individual(products)
+        else:
+            # Si tiene más de 5, usar ruta batch (PATCH) para evitar un limit requests
+            self._update_product_price_tn_batch(products)
+
+    def _update_product_price_tn_individual(self, products):
+        """Actualiza precios usando PUT individual por variante (para ≤ 5 variantes)"""
         headers = self.get_headers_tn()
         for product in products:
-            categorias = []
             for variant in product.product_variant_ids.filtered(lambda x: x.product_id_tn != False):
-                url = "https://api.tiendanube.com/v1/%s/products/%s/variants/%s" % (self.tiendanube_id, product.id_tn, variant.product_id_tn)
+                url = "https://api.tiendanube.com/v1/%s/products/%s/variants/%s" % (
+                    self.tiendanube_id, product.id_tn, variant.product_id_tn)
 
                 price_tn = self.tn_pricelist_id._get_product_price(variant.product_tmpl_id, quantity=1)
                 if price_tn is None:
@@ -349,7 +385,42 @@ class TiendaNubeResCompanyInherit(models.Model):
                 }
                 response = requests.put(url, headers=headers, json=data)
                 if response.status_code != 200:
-                    raise ValidationError('Error al actualizar stock de Tienda Nube: %s' % response.text)
+                    raise ValidationError('Error al actualizar precio de Tienda Nube: %s' % response.text)
+
+    def _update_product_price_tn_batch(self, products):
+        """Actualiza precios usando PATCH batch (para > 5 variantes)"""
+        url = "https://api.tiendanube.com/v1/%s/products/stock-price" % self.tiendanube_id
+        headers = self.get_headers_tn()
+
+        data_products = []
+
+        for product in products:
+            data_variants = []
+            for variant in product.product_variant_ids.filtered(lambda x: x.product_id_tn != False):
+                price_tn = self.tn_pricelist_id._get_product_price(variant.product_tmpl_id, quantity=1)
+                if price_tn is None:
+                    price_tn = variant.list_price
+                if self.tn_type_tax == 'not_included':
+                    price_tn = variant.taxes_id.compute_all(price_tn)['total_included']
+
+                data_variants.append({
+                    'id': int(variant.product_id_tn),
+                    "price": price_tn,
+                })
+
+            if data_variants:
+                data_products.append({
+                    'id': int(product.id_tn),
+                    'variants': data_variants
+                })
+
+        # Dividir en lotes de hasta 40 variantes
+        batches = self._split_batches(data_products, 40)
+
+        for batch in batches:
+            response = requests.patch(url, headers=headers, json=batch)
+            if response.status_code != 200:
+                raise ValidationError('Error al actualizar precios de Tienda Nube: %s' % response.text)
 
     #Actualizamos stock de productos en TN con PATCH /products/stock-price
     def update_product_stock_tn(self, products, location_id_tn):
@@ -393,29 +464,7 @@ class TiendaNubeResCompanyInherit(models.Model):
                 'variants': data_variants
             })
     
-        # Dividir en lotes de hasta 40 variantes
-        def split_batches(products, max_variants):
-            batches = []
-            current_batch = []
-            current_variants_count = 0
-            
-            for product in products:
-                product_variants_count = len(product["variants"])
-                
-                if current_variants_count + product_variants_count > max_variants:
-                    batches.append(current_batch)
-                    current_batch = []
-                    current_variants_count = 0
-                
-                current_batch.append(product)
-                current_variants_count += product_variants_count
-            
-            if current_batch:
-                batches.append(current_batch)
-            
-            return batches
-    
-        batches = split_batches(data_products, 40)
+        batches = self._split_batches(data_products, 40)
         
         for batch in batches:
             response = requests.patch(url, headers=headers, json=batch)
