@@ -2,7 +2,7 @@
 
 Conector de **Tienda Nube** para **Odoo** que permite sincronizar catálogo, categorías, variantes, precios, stock, pedidos, cupones y metadatos comerciales entre ambas plataformas. Incluye **webhooks** para eventos de Tienda Nube, **wizards** de importación/sincronización masiva y un **log centralizado** de eventos.
 
-> Compatibilidad probada en Odoo **15, 16, 17 y 18**
+> Compatibilidad probada en Odoo **15, 16, 17, 18 y 19**
 
 ---
 
@@ -79,9 +79,9 @@ odoo_tienda_nube/
 
 ## Instalación
 
-1. **Requisitos**  
-   - Odoo 15/16/17/18 (instalar la versión del módulo correspondiente a tu versión).  
-   - Python: `requests`, `Pillow`.  
+1. **Requisitos**
+   - Odoo 15/16/17/18/19 (instalar la versión del módulo correspondiente a tu versión).
+   - Python: `requests`, `Pillow`.
    - Usuario con permisos de configuración en Odoo.
 
 2. **Cargar el módulo** en la carpeta de addons y **actualizar lista de aplicaciones**.  
@@ -158,7 +158,6 @@ odoo_tienda_nube/
 
 ## Roadmap corto
 
-- Mig a Odoo 19
 - Page en Notebook de product para unificar botones y caracteristicas para TN
 - Facturacion y Pagos automaticos de ventas en TN a Odoo
 

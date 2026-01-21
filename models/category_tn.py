@@ -7,6 +7,7 @@ _logger = logging.getLogger(__name__)
 
 class CategoryTn(models.Model):
     _name = 'category.tn'
+    _description = 'Categoria Tienda Nube'
 
     name = fields.Char(string='Nombre', required=True)
     tn_id = fields.Integer(string='Tienda Nube ID')

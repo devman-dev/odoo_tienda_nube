@@ -1,5 +1,11 @@
 # Changelog — Tienda Nube ⇆ Odoo Connector
 
+## [19.0.1.0.0] - 2026-01-21
+### Changed
+- Migración del módulo a Odoo 19.0 siguiendo las guías de OCA.
+- Se agrega `_description` faltante en el modelo `category.tn`.
+- Actualización de documentación (README) para reflejar compatibilidad con Odoo 19.
+
 ## [18.0.6.0.0] - 2025-12-31
 ### Fixed
 - Se modifica algorimo de actualización de precios para evitar el límite de solicitudes de Tienda Nube al realizar actualizaciones masivas.
