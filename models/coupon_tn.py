@@ -28,6 +28,7 @@ class CouponTn(models.Model):
     min_price = fields.Float('Min Price')
     used = fields.Integer('Usado', default=0)
     categoria_tn_ids = fields.Many2many('category.tn', string='Categorias Tienda Nube', help="Categorias de Tienda Nube")
+    company_id = fields.Many2one('res.company', string='Compañía', default=lambda self: self.env.company, required=True, index=True)
 
     @api.constrains('start_date', 'end_date')
     def _check_dates(self):

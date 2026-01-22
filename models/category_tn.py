@@ -11,6 +11,7 @@ class CategoryTn(models.Model):
     name = fields.Char(string='Nombre', required=True)
     tn_id = fields.Integer(string='Tienda Nube ID')
     parent_id = fields.Many2one('category.tn', string='Categoria Padre')
+    company_id = fields.Many2one('res.company', string='Compañía', default=lambda self: self.env.company, required=True, index=True)
 
     # Metodo crear o actualizar en Tienda Nube POST /categories
     def create_or_update_tn(self):
