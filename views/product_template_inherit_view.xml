@@ -6,16 +6,11 @@
             <field name="inherit_id" ref="product.product_template_only_form_view"/>
             <field name="arch" type="xml">
 
-                <header position="inside">
-                    <button name="update_tn" string="Actualizar en Tienda Nube" type="object" class="oe_highlight" invisible="id_tn == False"/>
-                    <button name="update_product_image_tn" string="Actualizar Imagen en Tienda Nube" type="object" class="oe_highlight" invisible="id_tn == False"/>
-                    <button name="update_stock_tn" string="Actualizar Stock en Tienda Nube" type="object" class="oe_highlight" invisible="id_tn == False"/>
-                    <button name="unlink_tn" string="Desvincular en Tienda Nube" type="object" invisible="id_tn == False"/>
-                    <button name="create_tn" string="Crear en Tienda Nube" type="object" class="oe_highlight"  invisible="id_tn != False"/>
-                </header>
+               
 
                 <field name="categ_id" position="after">
-                    <field name="categoria_tn_ids" domain="[('tn_id', '!=', False)]" options="{'no_create': True, 'no_create_edit':True}" widget="many2many_tags"/>
+                    <field name="categoria_tn_ids" domain="[('tn_id', '!=', False)]"
+                           options="{'no_create': True, 'no_create_edit':True}" widget="many2many_tags"/>
                     <field name="id_tn" readonly="1"/>
                     <field name="canonical_url" readonly="1" widget="url"/>
                     <field name="envio_gratis_tn"/>
@@ -35,19 +30,41 @@
                 <xpath expr="//page[@name='sales']/group[@name='sale']" position="inside">
                     <group colspan="2" name="product_template_images_tn" string="Galeria de Tienda Nube">
                         <field
-                            colspan="2"
-                            name="product_template_image_tn_ids"
-                            class="o_website_tn_image_list"
-                            context="{'default_name': name}"
-                            mode="kanban"
-                            add-label="Agregar Imagen"
-                            nolabel="1"
-                            widget="x2_many_media_viewer"
-                            options="{'convert_to_webp': True}"
+                                colspan="2"
+                                name="product_template_image_tn_ids"
+                                class="o_website_tn_image_list"
+                                context="{'default_name': name}"
+                                mode="kanban"
+                                add-label="Agregar Imagen"
+                                nolabel="1"
+                                widget="x2_many_media_viewer"
+                                options="{'convert_to_webp': True}"
                         />
                     </group>
                 </xpath>
-                
+
+                <xpath expr="//page[@name='inventory']" position="after">
+                    <page name="tienda_nube_inventory" string="Tienda Nube">
+                        <group>
+                            <group>
+                                <button name="update_tn" string="Actualizar en Tienda Nube" type="object"
+                                        class="oe_highlight" invisible="id_tn == False"/>
+                                <button name="update_product_image_tn" string="Actualizar Imagen en Tienda Nube"
+                                        type="object" class="oe_highlight" invisible="id_tn == False"/>
+                                <button name="update_stock_tn" string="Actualizar Stock en Tienda Nube" type="object"
+                                        class="oe_highlight" invisible="id_tn == False"/>
+                            </group>
+                            <group>
+                                <button name="unlink_tn" string="Desvincular en Tienda Nube" type="object"
+                                        invisible="id_tn == False"/>
+                                <button name="create_tn" string="Crear en Tienda Nube" type="object"
+                                        class="oe_highlight"
+                                        invisible="id_tn != False"/>
+                            </group>
+                        </group>
+                    </page>
+                </xpath>
+
             </field>
         </record>
     </data>

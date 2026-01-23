@@ -56,11 +56,9 @@
         <field name="model">tn.log</field>
         <field name="arch" type="xml">
             <search>
-                <group expand="1" string="Group By">
-                    <filter string="Nombre" name="name" domain="[]" context="{'group_by':'name'}"/>
-                    <filter string="Tipo" name="level" domain="[]" context="{'group_by':'level'}"/>
-                    <filter string="Modelo" name="model" domain="[]" context="{'group_by':'model'}"/>
-                </group>
+                <filter string="Nombre" name="group_by_name" domain="[]" context="{'group_by':'name'}"/>
+                <filter string="Tipo" name="group_by_level" domain="[]" context="{'group_by':'level'}"/>
+                <filter string="Modelo" name="group_by_model" domain="[]" context="{'group_by':'model'}"/>
             </search>
         </field>
     </record>
