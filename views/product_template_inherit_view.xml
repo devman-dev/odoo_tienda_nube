@@ -6,7 +6,7 @@
             <field name="inherit_id" ref="product.product_template_only_form_view"/>
             <field name="arch" type="xml">
 
-               
+
 
                 <field name="categ_id" position="after">
                     <field name="categoria_tn_ids" domain="[('tn_id', '!=', False)]"
@@ -47,19 +47,19 @@
                     <page name="tienda_nube_inventory" string="Tienda Nube">
                         <group>
                             <group>
+                                <button name="create_tn" string="Crear en Tienda Nube" type="object"
+                                        class="oe_highlight"
+                                        invisible="id_tn != False"/>
+                                <button name="unlink_tn" string="Desvincular en Tienda Nube" type="object"
+                                        invisible="id_tn == False"/>
+                            </group>
+                            <group>
                                 <button name="update_tn" string="Actualizar en Tienda Nube" type="object"
                                         class="oe_highlight" invisible="id_tn == False"/>
                                 <button name="update_product_image_tn" string="Actualizar Imagen en Tienda Nube"
                                         type="object" class="oe_highlight" invisible="id_tn == False"/>
                                 <button name="update_stock_tn" string="Actualizar Stock en Tienda Nube" type="object"
                                         class="oe_highlight" invisible="id_tn == False"/>
-                            </group>
-                            <group>
-                                <button name="unlink_tn" string="Desvincular en Tienda Nube" type="object"
-                                        invisible="id_tn == False"/>
-                                <button name="create_tn" string="Crear en Tienda Nube" type="object"
-                                        class="oe_highlight"
-                                        invisible="id_tn != False"/>
                             </group>
                         </group>
                     </page>
